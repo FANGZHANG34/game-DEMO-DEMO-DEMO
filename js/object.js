@@ -89,6 +89,10 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
             window.gameManager.gameMessage.self.classList.add('disappear');
             loadCartoon();
         }
+    ]).set('4',[
+        '战斗',()=>{
+            window.gameManager.undertaleManager.loader();
+        }
     ])
     .forEach(function(value,key){this[key] = value[0];},objectArray.eventArray.list = {});
 }

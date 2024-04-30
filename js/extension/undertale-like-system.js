@@ -3,10 +3,10 @@
     window.onload = ()=>{
         oldWindowOnload();
         const undertaleManager = window.gameManager.undertaleManager = {
-            body:{self:makeElement('div',{id: 'undertaleBody'/*,className: 'disappear'*/})},
-            undertaleProcess:window.gameManager.undertaleProcess = {
-                intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,
-                defaultFn: ()=>{
+            body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: undefined,
+            undertaleProcess: window.gameManager.undertaleProcess = {
+                intervalID: undefined,timeSep: undefined,paused: true,onEvent: undefined,nowFn: undefined,
+                defaultFn:()=>{
                     let temp;
                     if(undertaleManager.fighter.id !== undefined){
                         const previous = [undertaleManager.fighter.x,undertaleManager.fighter.y];
@@ -19,12 +19,21 @@
                         }
                     }
                 }
+            },
+            loadTempMemory(){this.tempMemory = copyObj(window.gameManager.gameFileSL.origin['0'].memory)},
+            loader(enemyID,fighterID = window.gameManager.gamePlayer.id){
+                window.gameManager.playerMove.paused = true;
+                this.loadTempMemory();
+                this.fighterCondition.loader(fighterID);
+                this.UTtheater.fighter.loader(fighterID,25,25);
+                this.body.self.classList.remove('disappear');
+                this.undertaleProcess.paused = false;
             }
         };
         {
             let temp;
             const fighterCondition = undertaleManager.fighterCondition = {
-                id: undefined,object: undefined,allMemory:copyObj(window.gameManager.gameFileSL.origin['0'].memory),self:makeElement('div',{id: 'fighterConditionStage'}),
+                id: undefined,object: undefined,self: makeElement('div',{id: 'fighterConditionStage'}),
                 loader(objectID){}
             };
             ['Charge','Debuff','Buff','MP','HP','This'].reduce(
@@ -37,7 +46,7 @@
         {
             let temp;
             const UTtheater = undertaleManager.UTtheater = {
-                self:makeElement('div',{id: 'UTtheater'}),
+                self: makeElement('div',{id: 'UTtheater'}),
                 loader(){}
             };
             UTtheater.cornerNodeArray = [0,1,2,3].map(x=>(
@@ -46,7 +55,7 @@
             ));
             {
                 const UTenemyAttack = UTtheater.enemyAttack = {
-                    array: undefined,nodeArray:{},tempNode:makeElement('div',{className: 'enemyAttack',innerHTML: '<div></div>'}),
+                    array: undefined,nodeArray:{},tempNode: makeElement('div',{className: 'enemyAttack',innerHTML: '<div></div>'}),
                     loader(enemyID){
                         for(let i in this.nodeArray){this.nodeArray[i].remove();}
                         this.array = {};
@@ -66,7 +75,7 @@
                             this.object = objectArray.characterArray.get(id);
                             this.display.style.backgroundImage = `url(${this.object.display})`;
                         }
-                        this.self.style.marginLeft = (this.x = x)+'vw';this.self.style.marginTop = (this.y = y)+'vw';
+                        this.self.style.marginLeft = (this.x = x)+'vw',this.self.style.marginTop = (this.y = y)+'vw';
                     }
                 };
                 fighter.display = fighter.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighterDisplay'}));
@@ -74,10 +83,10 @@
         }
         {
             const fighterBoard = undertaleManager.fighterBoard = {
-                self:makeElement('div',{id: 'fighterBoard'}),
-                fighterSkill:{self:makeElement('div',{id: 'fighterSkill'})},
-                fighterItem:{self:makeElement('div',{id: 'fighterItem'})},
-                fighterPartner:{self:makeElement('div',{id: 'fighterPartner'})}
+                self: makeElement('div',{id: 'fighterBoard'}),
+                fighterSkill: {self: makeElement('div',{id: 'fighterSkill'})},
+                fighterItem: {self: makeElement('div',{id: 'fighterItem'})},
+                fighterPartner: {self: makeElement('div',{id: 'fighterPartner'})}
             }
             for(let i in fighterBoard){i === 'self' || fighterBoard.self.insertAdjacentElement('beforeend',fighterBoard[i].self);}
         }

@@ -114,12 +114,10 @@ window.onload = function(){
                 return true;
             },
             onPointEvent(xyz){
-                Object.values(this.mapInfo[3]).forEach(eventArraylike=>{
-                    const temp = eventArraylike.concat();
-                    let n;
-                    for(let i of xyz){if((n = temp.shift()) !== null && n !== i){return;}}
-                    objectArray.eventArray.get(temp[0])[1]();
-                });
+                for(let i of this.mapInfo[3]){
+                    if(!((xyz[0] === null || xyz[0] === i[0]) && (xyz[1] === null || xyz[1] === i[1]) && (xyz[2] === null || xyz[2] === i[2])))
+                    {continue;}else{objectArray.eventArray.get(i[3])[1]();return;}
+                }
             }
         };
         for(let i of gameMap.mapConcat){i.style.zIndex = i.id[3];[i.width,i.height] = [singleStepLength * mapWidth,singleStepLength * mapHeight];}
@@ -290,8 +288,8 @@ window.onload = function(){
         const gameInfoSL = gameManager.gameInfoSL = {
             temp: undefined,index: undefined,
             self: document.getElementById('infoSL'),
-            saveDataTemp: {mapID:"001",id:0,xyz:[16,9,0],partner:{},switch:[],memory:{characterArray:{},itemList:{},maprDateArray:{}}},
-            nowInfoSL0:{mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
+            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],memory: {characterArray: {},itemList: {},maprDateArray: {}}},
+            nowInfoSL0: {mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
             shower(){
                 this.stage.textContent = this.index === '0' ? '当前信息（自动更新，只能读取）：' : '信息：';
                 if(gameManager.gameInfoSL.temp){
