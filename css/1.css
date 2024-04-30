@@ -1,0 +1,74 @@
+/* UT（undertale）主体 */
+#undertaleBody{
+    position: fixed;
+    font-size: 2.5vw;
+    color: white;
+    width: 100vw;
+    height: 56.25vw;
+    z-index: 6;
+    line-height: 2.5vw;
+}#undertaleBody>div{
+    vertical-align: top;
+    display: inline-block;
+    height: 56.25vw;
+}#fighterConditionStage,#fighterBoard{
+    width: 21.875vw;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+/* 状态栏 */
+#fighterConditionStage>div{
+    height: 2.5vw;
+}#fighterHP,#fighterMP,#fighterCharge{
+    margin-left: 10vw;
+    width: 10vw;
+}#fighterHP{
+    background-color: #0c0;
+}#fighterMP{
+    background-color: #00c;
+}#fighterCharge{
+    background-color: #ccc;
+}.fighterInfoName,.fighterInfoText{
+    text-align: center;
+    width: 10vw;
+    height: 2.5vw;
+}.fighterInfoName{
+    margin-left: -10vw;
+}#fighterBuff,#fighterDebuff{
+    overflow: scroll;
+}#fighterPhoto{
+    width: 20vw;
+    height: 41.25vw;
+    background-color: aquamarine;
+}
+/* 战场 */
+#UTtheater{
+    width: 56.25vw;
+    background-size: 56.25vw 56.25vw;
+    background-image: url(../img/bg.png);
+}#UTfighter,.UTtheaterCorner{
+    position: absolute;
+    width: 6.25vw;
+    height: 6.25vw;
+}.enemyAttack{
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: solid 3.125vw red;
+}.UTtheaterCorner{
+    position: absolute;
+    background-image: url(../img/林元.jpg);
+    background-size: 6.25vw;
+}#UTfighterDisplay{
+    background-image: url(../img/无名剑客.jpg);
+    background-position: -3.125vw -3.125vw;
+    background-repeat: no-repeat;
+    background-size: 6.25vw;
+    width: 0;
+    height: 0;
+    border: solid 3.125vw rgba(0, 0, 0, 0);
+    border-radius: 3.125vw;
+}
+/* 操控面板 */
+#fighterBoard{
+    writing-mode: vertical-lr;
+}

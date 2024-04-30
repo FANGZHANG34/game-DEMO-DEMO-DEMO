@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0, minimum-scale=0.25">
+    <title>DEMO</title>
+    <link rel="stylesheet" href="./css/0.css" type="text/css" as="style" id="style0"/>
+    <script src="./js/lz-string.min.js" type="text/javascript"></script>
+    <script src="./js/fn.js" type="text/javascript"></script>
+    <script src="./js/object.js" type="text/javascript"></script>
+    <script src="./js/map.js" type="text/javascript"></script>
+    <script src="./js/default-config-save.js" type="text/javascript"></script>
+    <script src="./js/main1.js" type="text/javascript"></script>
+    <!-- 上面的link、script是基础模块，下面的link、script扩展模块 -->
+    <link rel="stylesheet" href="./css/1.css" type="text/css" as="style" id="style1"/>
+    <script src="./js/extension/skill.js" type="text/javascript"></script>
+    <script src="./js/extension/item.js" type="text/javascript"></script>
+    <script src="./js/extension/undertale-like-system.js" type="text/javascript"></script>
+</head>
+<body id="gameBody">
+    <div id="gameBorder"></div>
+    <canvas id="map0" class="mapImg"></canvas>
+    <canvas id="map1" class="mapImg"></canvas>
+    <canvas id="map2" class="mapImg"></canvas>
+    <canvas id="map3" class="mapImg"></canvas>
+    <div id="player"></div>
+    <canvas id="playerPhoto"></canvas>
+    <div id="gameMapBoard" class="disappear"></div>
+    <canvas id="messageImage" class="disappear"></canvas>
+    <video id="messageVideo" class="disappear"></video>
+    <div id="gameMessage" class="disappear">
+        <div id="messageSenderInfo">
+            <div id="messageSenderName"></div>
+            <canvas id="messageSenderStage"></canvas>
+        </div><div id="messageContent">
+            <pre id="messageText"></pre>
+        </div><div id="messageOption">
+            <div id="messageDialogue">
+                <div id="messageNext">继续</div>
+                <div id="messageAuto">自动</div>
+                <div id="messageSkip">跳过</div>
+                <div id="messageNormal">正常</div>
+            </div>
+            <div id="messageChoice"></div>
+        </div>
+    </div>
+    <div id="menu">
+        <div id="option">
+            <div id="title">DEMO</div>
+            <div id="openGame">打开存档</div>
+            <div id="characterGame">人物面板</div>
+            <div id="gallery">成就</div>
+            <div id="config">设置</div>
+            <div id="importGame">导入存档</div>
+            <div id="exportGame">导出存档</div>
+            <div id="resetGame">重置游戏</div>
+        </div><div id="menuBoard">
+            <div id="guide" class="disappear">
+                <pre>
+                游戏说明（附作者的自我批评）
+操作方法：
+    一、菜单面板
+        （一）DEMO：游戏标题，点击可以打开游戏说明
+        （二）打开存档：共计21个存档位，预留一个在未来用做自动存档（未完成）
+        （三）人物面板：（未完成）
+        （四）成就：（未完成）
+        （五）设置：可以通过上下滑动红蓝条调节音量和语速，预留难度位（未完成），只有点击“应用”后才能保存设置
+        （六）导入存档：导入一个特定的JSON文件作为存档
+        （七）导出存档：导出一个特定的JSON文件用来转移存档
+        （八）重置游戏：清理游戏的浏览器缓存并重启游戏
+    二、游玩界面
+        （一）键位
+         1. W-S-A-D 上下左右移动
+         2. Q 显示-隐藏对话消息框（对话期间无法移动），（未完成-“自动”、“跳过”功能）
+         3. C 显示-隐藏立绘（没上好图...）
+         4. 空格 在看视频时可以开启-关闭进度条（实验中）
+        （二）鼠标
+            点击地图可以无视限制移动，但无法触发任何事件
+        （三）内容
+            听歌、看片（正经）、看动画
+            用 W-S-A-D 移动到左上角可以触发事件（实验中）
+            丁真有碰撞体积
+作者：
+    与其说时DEMO，不如说是DEMO中的DEMO中的DEMO——相当于半个游戏引擎的样子。
+    之所以放弃市面上诸多成熟的游戏引擎，一来需要许多时间成本和精力来学习，二来有许多想要的功能都难以实现，三是RPGMaker的插件制作没有教程，综合来看还不如直接自制游戏，起码JS语言远远比这些要简单。
+    说到底是懒，目光短浅，选了短期内比较好走的路。
+    轮子造了一半，但身体有点吃不消，终究只是试一下，以后就有缘更新了。
+    
+        ——八十年老坊酱才是正宗
+                </pre>
+            </div>
+            <div id="characterBoard" class="disappear">
+                <div id="characterContent">
+                    <div id="characterList"></div>
+                    <div id="characterInfo"></div>
+                    <div id="itemBoard"></div>
+                </div><canvas id="characterDisplay"></canvas>
+            </div><div id="SL" class="disappear">
+            </div><div id="infoSL" class="disappear">
+                <div id="loadSL">读取</div><div id="saveSL">写入</div><div id="deleteSL">删除</div>
+                <pre></pre>
+            </div><div id="myGallery" class="disappear">
+                <img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode">
+            </div><div id="myConfig" class="disappear"><div>
+                    <div id="saveConfig">应用</div><div id="resetConfig">重置</div>
+                </div><div id="globalVolume">
+                    <div class="configName">总音量</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div><div id="bgm">
+                    <div class="configName">背景音乐</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div><div id="bgs">
+                    <div class="configName">音效</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div><div id="dialogueVolume">
+                    <div class="configName">对话音量</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div><div id="textSep">
+                    <div class="configName">语速</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div><div id="modeHard">
+                    <div class="configName">难度</div><div class="configText"></div><div class="scrollDiv"><div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

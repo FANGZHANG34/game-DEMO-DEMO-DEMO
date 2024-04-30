@@ -1,0 +1,287 @@
+*{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    transition-duration: 200ms;
+}:root{
+    --mapWidth: 1920px;
+}html{
+    background-color: black;
+    transition: all 66ms linear;
+}body{
+    width: 100vw;
+    height: calc((var(--mapWidth) - 100vw) * 9 / 16 + 100vh);
+    overflow: hidden;
+}hr{
+    border: solid 1px white;
+}.disappear{
+    display: none !important;
+    visibility: hidden;
+}::-webkit-scrollbar{
+    display: none;
+}
+/*挡板*/
+#gameBorder{
+    position: fixed;
+    background-color: black;
+    margin-top: 56.25vw;
+    width: 100vw;
+    height: calc(100vh - 56.25vw);
+    z-index: 6;
+}
+/*地图*/
+canvas.mapImg{
+    position: absolute;
+}
+/*对象*/
+#player,.mapObject{
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    transition: all 66ms linear;
+}
+/*立绘*/
+#playerPhoto{
+    position: fixed;
+    margin-left: 80vw;
+    width: 20vw;
+    height: 56.25vw;
+    z-index: 4;
+}
+/*触控*/
+#gameMapBoard{
+    position: absolute;
+    z-index: 5;
+}#gameMapBoard div{
+    height: 60px;
+    vertical-align: top;
+}#gameMapBoard>div>div{
+    display: inline-block;
+    width: 60px;
+}#gameMapBoard>div>div:hover{
+    background-color: rgba(225, 225, 225, 0.2);
+}#gameMapBoard>div>div:active{
+    background-color: rgba(225, 225, 225, 0.8);
+    transition-duration: 50ms;
+}
+/*媒体*/
+#messageVideo,#messageImage,video{
+    position: fixed;
+    z-index: 8;
+    width: 100vw;
+    height: 56.25vw;
+}
+/*消息*/
+#gameMessage{
+    color: white;
+    position: fixed;
+    z-index: 8;
+    margin-top: calc(425vw / 12);
+    width: 100vw;
+    height: calc(125vw / 6);
+    border-top: solid calc(1vw / 6) #ccc;
+}#gameMessage>div{
+    height: calc(125vw / 6);
+    display: inline-block;
+    vertical-align: top;
+}#messageSenderInfo{
+    width: calc(50vw / 3);
+}#messageSenderName{
+    height: calc(25vw / 6);
+    font-size: 3vw;
+    text-align: center;
+    align-content: center;
+}canvas#messageSenderStage{
+    width: calc(50vw / 3);
+    height: calc(50vw / 3);
+}#messageContent{
+    background-color: rgba(0, 0, 0, 0.5);
+    width: calc(151vw / 3);
+    overflow-y: scroll;
+}#messageText{
+    font-size: 2vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    text-align: center;
+}#messageOption{
+    width: 33vw;
+}#messageOption>div{
+    position: absolute;
+    overflow: scroll;
+    background-color: rgba(225, 225, 225, 0.1);
+    width: 33vw;
+    height: calc(125vw / 6);
+}#messageOption>div>div{
+    width: 33vw;
+    height: 4vw;
+    font-size: 3vw;
+    text-align: center;
+    align-content: center;
+}#messageOption>div>div:hover{
+    font-size: 4vw;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+/*菜单*/
+#menu{
+    background-image: url(../img/bg.png);
+    background-size: 100vw;
+    background-repeat: no-repeat;
+    position: fixed;
+    width: 100vw;
+    height: 56.25vw;
+    color: #fff;
+    z-index: 9;
+}#menu>div,#menuBoard>div{
+    display: inline-block;
+    vertical-align: top;
+    height: 50vw;
+}#option{
+    overflow-y: scroll;
+    text-align: center;
+    font-size: 5vw;
+    width: 30vw;
+}#option>div{
+    height: 7.5vw;
+    align-content: center;
+}#option>div:hover{
+    font-size: 7.5vw;
+    background-color: rgba(225, 225, 225, 0.5);
+}#menuBoard{
+    width: 60vw;
+    overflow: hidden;
+    border: solid calc(5vw / 12) rgba(225, 225, 225, 0.5);
+}#menuBoard>div{
+    position: absolute;
+    width: 60vw;
+}#guide{
+    overflow-y: scroll;
+}#guide>pre{
+    font-size: 2vw;
+    font-weight: bold;
+    color: #faa;
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: left;
+    line-height: 3vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}#characterBoard>*{
+    display: inline-block;
+    vertical-align: middle;
+}#characterContent{
+    width: 40vw;
+    height: 50vw;
+    margin: 0 2vw;
+}#characterContent>div{
+    overflow: scroll;
+}#characterList{
+    height: 7.5vw;
+    font-size: 5vw;
+}#characterInfo{
+    height: 22.5vw;
+    font-size: 2.5vw;
+}#itemBoard{
+    height: 20vw;
+    font-size: 2.5vw;
+}#characterDisplay{
+    width: 16vw;
+    height: 45vw;
+}.galleryNode{
+    width: 16vw;
+    height: 9vw;
+    margin: 2vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: inline-block;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}#myConfig{
+    writing-mode: vertical-lr;
+    white-space: nowrap;
+    overflow: scroll hidden;
+}#myConfig>div{
+    width: 5vw;
+    height: 50vw;
+    font-size: 2.5vw;
+    margin-left: 2.5vw;
+    background-color: rgba(225, 225, 225, 0.5);
+    vertical-align: top;
+}#myConfig>div>div{
+    vertical-align: top;
+    display: inline-block;
+}#saveConfig,#resetConfig,.configName,.configText{
+    width: 5vw;
+    height: 15vw;
+    text-align: center;
+    line-height: 5vw;
+    overflow-wrap: break-word;
+    background-color: #555;
+}.configText{
+    writing-mode: horizontal-tb;
+}#saveConfig:hover,#resetConfig:hover{
+    background-color: #999;
+}.scrollDiv{
+    width: 5vw;
+    height: 20vw;
+    overflow: hidden overlay;
+}.scrollDiv::-webkit-scrollbar{
+    display: block;
+    width: 2.5vw;
+    background: linear-gradient( #900, #900 2.5vw, #009 17.5vw, #009);
+}.scrollDiv::-webkit-scrollbar-thumb{
+    display: block;
+    width: 2.5vw;
+    height: 2.5vw;
+    background: rgba(0, 135, 0, 0.8);
+}.scrollDiv::-webkit-scrollbar-thumb:hover{
+    background: #090;
+}.scrollDiv>div{
+    width: 5vw;
+    height: calc(20vw + 1000px);
+    background: linear-gradient( #900, #900 20vw, #009 1000px, #009);
+}
+#SL{
+    font-size: 2.5vw;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 30vw !important;
+    text-align: center;
+    overflow: scroll;
+}#SL>div{
+    height: 5vw;
+    align-content: center;
+}#SL>div:hover{
+    font-size: 5vw;
+    background-color: rgba(225, 225, 225, 0.2);
+}#SL>div.focus{
+    font-size: 4vw;
+    background-color: rgba(150, 225, 150, 0.6);
+}#infoSL{
+    margin-left: 30vw;
+    background-color: black;
+    width: 30vw !important;
+    font-size: 3vw;
+}#infoSL>div{
+    width: 10vw;
+    height: 5vw;
+    text-align: center;
+    display: inline-block;
+    vertical-align: top;
+    align-content: center;
+}#infoSL>div:hover{
+    opacity: 0.5;
+}#loadSL{
+    background-color: #0c0;
+}#saveSL{
+    background-color: #00c;
+}#deleteSL{
+    background-color: #c00;
+}#infoSL>pre{
+    height: 45vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    overflow: scroll;
+}#characterBoard{
+    background-color: rgba(0, 0, 0, 0.2);
+}#myGallery{
+    background-color: #faa;
+}#myConfig{
+    background-color: #000;
+}
