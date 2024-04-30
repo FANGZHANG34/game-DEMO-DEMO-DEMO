@@ -1,0 +1,62 @@
+const itemArray = {onceArray: new Map(),twiceArray: new Map(),onfitArray: new Map()};
+{
+    itemArray.onceArray.set('绷带',{
+        class:'恢复',
+        display:'./img/无名剑客.jpg',
+        description:'',
+        onEvent(){}
+    }).set('气血丹',{
+        class:'成长',
+        display:'./img/林元.jpg',
+        description:'',
+        onEvent(){}
+    })
+    .forEach(function(value,key){this[value.class].push(key);},itemArray.onceArray.list = {
+        恢复:[],
+        成长:[],
+        功能:[],
+        战斗:[],
+        材料:[],
+        杂类:[]
+    });
+}
+{
+    itemArray.twiceArray.set('绷带',{
+        class:'恢复',
+        display:'./img/无名剑客.jpg',
+        description:'',
+        onEvent(){}
+    }).set('气血丹',{
+        class:'成长',
+        display:'./img/林元.jpg',
+        description:'',
+        onEvent(){}
+    })
+    .forEach(function(value,key){this[value.class].push(key);},itemArray.twiceArray.list = {
+        恢复:[],
+        成长:[],
+        功能:[],
+        战斗:[],
+        道具:[]
+    });
+}
+{
+    itemArray.onfitArray.set('绷带',{
+        class:'上肢',
+        display:'./img/无名剑客.jpg',
+        description:'',
+        onEvent(){}
+    }).set('长袍',{
+        class:'上衣',
+        display:'./img/林元.jpg',
+        description:'',
+        onEvent(){}
+    })
+    .forEach(function(value,key){this[value.class].push(key);},itemArray.onfitArray.list = {
+        头部:[],
+        饰品:[],
+        上肢:[],上衣:[],内衣:[],
+        下肢:[],下裤:[],内裤:[],
+        足部:[]
+    });
+}
