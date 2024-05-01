@@ -195,11 +195,7 @@ window.onload = function(){
                     this.self.style.zIndex = xyz[2];
                     gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][xyz[2]]);
                 }
-                {
-                    this.self.style.marginLeft = xyz[0] * singleStepLength+'px';
-                    this.self.style.marginTop = xyz[1] * singleStepLength+'px';
-                }
-                // moveAnimation(getkeyframes('objectMove'),this.xyz,xyz);
+                this.self.animate([{marginLeft: xyz[0] * singleStepLength+'px',marginTop: xyz[1] * singleStepLength+'px'}],{duration: 66,fill: 'both'});
                 this.xyz = xyz.concat();
                 behavior && setTimeout(()=>this.focus(behavior),66);
             },
@@ -207,15 +203,15 @@ window.onload = function(){
                 const windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
                 const windowHeight = windowWidth * 9/16;
                 window.scrollTo({
-                    left:Math.min(
+                    left: Math.min(
                         Math.max(0,this.self.offsetLeft - (windowWidth - singleStepLength) / 2),
                         mapPositionWidth - windowWidth
                     ),
-                    top:Math.min(
+                    top: Math.min(
                         Math.max(0,this.self.offsetTop - (windowHeight - singleStepLength) / 2),
                         mapPositionHeight - windowHeight
                     ),
-                    behavior:behavior
+                    behavior: behavior
                 });
             }
         };
@@ -478,9 +474,10 @@ window.onload = function(){
                     let x = (temp = gameManager.gameMap.board.array.indexOf(e.target)) % mapWidth;
                     let y = Math.floor(temp / mapWidth);
                     if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[y][x]){
-                        gameManager.gamePlayer.self.style.marginLeft = (gameManager.gamePlayer.xyz[0] = x) * singleStepLength+'px',
-                        gameManager.gamePlayer.self.style.marginTop = (gameManager.gamePlayer.xyz[1] = y) * singleStepLength+'px';
-                        // gameManager.gamePlayer.loader(gameManager.gamePlayer.id,[x,y,gameManager.gamePlayer.xyz[2]],'smooth');
+                        gameManager.gamePlayer.self.animate([
+                            {marginLeft: (gameManager.gamePlayer.xyz[0] = x) * singleStepLength+'px',
+                            marginTop: (gameManager.gamePlayer.xyz[1] = y) * singleStepLength+'px'}
+                        ],{duration: 66,fill: 'both'});
                     }
                     setTimeout(()=>gameManager.gamePlayer.focus('smooth'),60);
                     break;

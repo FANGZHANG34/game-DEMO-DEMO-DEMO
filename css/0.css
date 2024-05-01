@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    transition-duration: 200ms;
+    transition-duration: 100ms;
 }:root{
     --mapWidth: 1920px;
 }html{
@@ -38,7 +38,6 @@ canvas.mapImg{
     position: absolute;
     width: 60px;
     height: 60px;
-    transition: all 66ms linear;
 }
 /*立绘*/
 #playerPhoto{

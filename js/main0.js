@@ -17,7 +17,7 @@ window.onload = function(){
                 clearInterval(temp.intervalID);
                 temp.intervalID = setInterval(()=>{
                     if(temp.paused){return;}
-                    else {(temp.onEvent || nullFn)();(temp.nowFn &&= temp.nowFn()) || (temp.defaultFn || nullFn)();}
+                    else {temp.onEvent?.();(temp.nowFn &&= temp.nowFn()) || temp.defaultFn?.();}
                 },timeSep);
             }
             return temp;
@@ -102,6 +102,7 @@ window.onload = function(){
                     }
                 }
                 gameManager.globalProcess.nowFn = this.mapInfo[4];
+                setTimeout(()=>{gameManager.gameFileSL.origin[0].mapID = mapID;});
             },
             onDirectionEvent(xyz){
                 for(let nodeCharacter of Object.values(this.objectManager.nodeArray)){
@@ -113,12 +114,10 @@ window.onload = function(){
                 return true;
             },
             onPointEvent(xyz){
-                Object.values(this.mapInfo[3]).forEach(eventArraylike=>{
-                    const temp = eventArraylike.concat();
-                    let n;
-                    for(let i of xyz){if((n = temp.shift()) !== null && n !== i){return;}}
-                    objectArray.eventArray.get(temp[0])[1]();
-                });
+                for(let i of this.mapInfo[3]){
+                    if(!((xyz[0] === null || xyz[0] === i[0]) && (xyz[1] === null || xyz[1] === i[1]) && (xyz[2] === null || xyz[2] === i[2])))
+                    {continue;}else{objectArray.eventArray.get(i[3])[1]();return;}
+                }
             }
         };
         for(let i of gameMap.mapConcat){i.style.zIndex = i.id[3];[i.width,i.height] = [singleStepLength * mapWidth,singleStepLength * mapHeight];}
@@ -190,7 +189,7 @@ window.onload = function(){
                     this.display = this.self.firstChild;
                     let temp = new Image();
                     temp.src = this.object.display;
-                    temp.onload=()=>this.display.getContext('2d').drawImage(temp,0,0);
+                    temp.onload=()=>{gameManager.gameFileSL.origin[0].id = id;this.display.getContext('2d').drawImage(temp,0,0);};
                 }
                 if(!this.xyz || this.xyz[2] !== xyz[2]){ 
                     this.self.style.zIndex = xyz[2];
@@ -289,8 +288,8 @@ window.onload = function(){
         const gameInfoSL = gameManager.gameInfoSL = {
             temp: undefined,index: undefined,
             self: document.getElementById('infoSL'),
-            saveDataTemp: {mapID:"001",id:0,xyz:[16,9,0],item:{},partner:{},switch:[],memory:{}},
-            nowInfoSL0:{mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
+            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],memory: {characterArray: {},itemList: {},maprDateArray: {}}},
+            nowInfoSL0: {mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
             shower(){
                 this.stage.textContent = this.index === '0' ? '当前信息（自动更新，只能读取）：' : '信息：';
                 if(gameManager.gameInfoSL.temp){
@@ -300,17 +299,18 @@ window.onload = function(){
             },
             loader(){
                 let temp = this.temp || this.saveDataTemp;
+                gameManager.gameFileSL.origin[0] = null;
                 gameManager.gameMap.loader(temp.mapID);
                 gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][temp.xyz[2]]);
                 gameManager.gameMap.objectManager.characterLoader(gameManager.gameMap.mapInfo[2]);
                 gameManager.gamePlayer.loader(temp.id,temp.xyz,'smooth');
                 gameManager.gameBody.menu.classList.add('disappear');
+                gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz:gameManager.gamePlayer.xyz});
             },
             saver(){
                 if(gameManager.gameMap.mapID){
                     if(confirm('确认覆盖存档？')){
-                        const tempSL = this.temp = gameManager.gameFileSL.origin[this.index] = Object.assign(this.saveDataTemp);
-                        [tempSL.mapID,tempSL.id,tempSL.xyz] = [gameManager.gameMap.mapID,gameManager.gamePlayer.id,gameManager.gamePlayer.xyz];
+                        this.temp = gameManager.gameFileSL.origin[this.index] = copyObj(gameManager.gameFileSL.origin[0]);
                         localStorage.setItem('saveDataArray',LZString.compress(JSON.stringify(gameManager.gameFileSL.origin)));
                         this.shower();
                     }else{alert('已取消保存。');}
@@ -318,7 +318,7 @@ window.onload = function(){
             },
             deleter(){
                 if(confirm('确认删除存档？')){
-                    this.temp = gameManager.gameFileSL.origin[this.index] = '';
+                    this.temp = gameManager.gameFileSL.origin[this.index] = 0;
                     localStorage.setItem('saveDataArray',LZString.compress(JSON.stringify(gameManager.gameFileSL.origin)));
                     this.shower();
                 }else{alert('已取消操作。');}
@@ -327,8 +327,6 @@ window.onload = function(){
         gameInfoSL.stage = gameManager.gameInfoSL.self.querySelector('pre');
         gameManager.setGameInterval('autoSL',300000).onEvent = ()=>{
                 if(gameManager.gameMap.mapID){
-                    const tempSL = gameManager.gameFileSL.origin['0'] = Object.assign(gameInfoSL.saveDataTemp);
-                    [tempSL.mapID,tempSL.id,tempSL.xyz] = [gameManager.gameMap.mapID,gameManager.gamePlayer.id,gameManager.gamePlayer.xyz];
                     localStorage.setItem('saveDataArray',LZString.compress(JSON.stringify(gameManager.gameFileSL.origin)));
                 }
             }
@@ -495,7 +493,7 @@ window.onload = function(){
             let temp;
             switch(temp = e.target.parentElement.id){
                 case 'SL':{
-                    gameManager.gameInfoSL.temp = gameManager.gameFileSL.origin[gameManager.gameInfoSL.index = +e.target.textContent.at(-1)];
+                    gameManager.gameInfoSL.temp = gameManager.gameFileSL.origin[gameManager.gameInfoSL.index = e.target.textContent.at(-1)];
                     Array.prototype.forEach.call(gameManager.gameFileSL.array,x=>x.classList.remove('focus'));
                     e.target.classList.add('focus');
                     gameManager.gameInfoSL.shower();
@@ -556,8 +554,8 @@ window.onload = function(){
                 }
                 case 'messageNormal':gameManager.globalProcess.nowFn = undefined;break;
                 case 'loadSL':gameManager.gameInfoSL.loader();break;
-                case 'saveSL':gameManager.gameInfoSL.index === '0' ? gameManager.gameInfoSL.saver() : alert('！！！自动存档不支持写入！！！');break;
-                case 'deleteSL':gameManager.gameInfoSL.index === '0' ? gameManager.gameInfoSL.deleter() : alert('！！！自动存档不支持删除！！！');break;
+                case 'saveSL':gameManager.gameInfoSL.index !== '0' ? gameManager.gameInfoSL.saver() : alert('！！！自动存档不支持写入！！！');break;
+                case 'deleteSL':gameManager.gameInfoSL.index !== '0' ? gameManager.gameInfoSL.deleter() : alert('！！！自动存档不支持删除！！！');break;
                 case 'config':{
                     for(let i in configArray.globalArray){
                         temp = [configArray.globalArray[i],gameManager.gameBody.menuBoard.config[i],undefined];

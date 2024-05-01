@@ -75,7 +75,7 @@
                             this.object = objectArray.characterArray.get(id);
                             this.display.style.backgroundImage = `url(${this.object.display})`;
                         }
-                        this.self.style.marginLeft = (this.x = x)+'vw',this.self.style.marginTop = (this.y = y)+'vw';
+                        this.self.animate([{marginLeft: (this.x = x)+'vw',marginTop: (this.y = y)+'vw'}],{duration: 33,fill: 'both'});
                     }
                 };
                 fighter.display = fighter.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighterDisplay'}));
