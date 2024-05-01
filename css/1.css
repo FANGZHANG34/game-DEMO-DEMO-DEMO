@@ -60,12 +60,10 @@
     background-size: 6.25vw;
 }#UTfighterDisplay{
     background-image: url(../img/无名剑客.jpg);
-    background-position: -3.125vw -3.125vw;
     background-repeat: no-repeat;
     background-size: 6.25vw;
-    width: 0;
-    height: 0;
-    border: solid 3.125vw rgba(0, 0, 0, 0);
+    width: 6.25vw;
+    height: 6.25vw;
     border-radius: 3.125vw;
 }
 /* 操控面板 */
