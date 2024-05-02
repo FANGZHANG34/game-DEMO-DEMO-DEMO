@@ -2,12 +2,11 @@
     margin: 0;
     padding: 0;
     border: 0;
-    transition-duration: 100ms;
+    transition-duration: 200ms;
 }:root{
     --mapWidth: 1920px;
 }html{
     background-color: black;
-    transition: all 66ms linear;
 }body{
     width: 100vw;
     height: calc((var(--mapWidth) - 100vw) * 9 / 16 + 100vh);
@@ -29,23 +28,13 @@
     height: calc(100vh - 56.25vw);
     z-index: 6;
 }
-/*地图*/
-canvas.mapImg{
+/*游戏主体*/
+#gameBody,canvas.mapImg{
     position: absolute;
-}
-/*对象*/
-#player,.mapObject{
+}#player,.mapObject{
     position: absolute;
     width: 60px;
     height: 60px;
-}
-/*立绘*/
-#playerPhoto{
-    position: fixed;
-    margin-left: 80vw;
-    width: 20vw;
-    height: 56.25vw;
-    z-index: 4;
 }
 /*触控*/
 #gameMapBoard{
@@ -62,6 +51,14 @@ canvas.mapImg{
 }#gameMapBoard>div>div:active{
     background-color: rgba(225, 225, 225, 0.8);
     transition-duration: 50ms;
+}
+/*立绘*/
+#playerPhoto{
+    position: fixed;
+    margin-left: 80vw;
+    width: 20vw;
+    height: 56.25vw;
+    z-index: 4;
 }
 /*媒体*/
 #messageVideo,#messageImage,video{

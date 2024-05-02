@@ -6,7 +6,11 @@ window.onload = function(){
     // gameManager 游戏管理者，游戏基框架的集合对象
     // .setGameInterval 设置游戏循环计时器的ID
     const gameManager = window.gameManager = {
-        moveDiraction: {},
+        constTemp: {
+            moveDiraction: {},moveKeyframes: [{marginLeft: undefined,marginTop: undefined}],
+            gameBodyKeyframes: [{marginLeft: undefined,marginTop: undefined}],
+            moveConfig: {duration: 66,fill: 'forwards'},UTmoveConfig: {duration: 33,fill: 'forwards'}
+        },
         setGameInterval(type,timeSep){
             let temp;
             if(!gameManager[type]){gameManager[type] = {intervalID: undefined,timeSep: undefined,paused: false,onEvent: ()=>{},nowFn: undefined};}
@@ -32,14 +36,14 @@ window.onload = function(){
                 let temp;
                 if(gameManager.gamePlayer.id !== undefined){
                     const previous = gameManager.gamePlayer.xyz.concat();
-                    if(temp = Object.values(gameManager.moveDiraction).at(-1)){
+                    if(temp = Object.values(gameManager.constTemp.moveDiraction).at(-1)){
                         switch(temp[0]){
                             case 'Left': previous[0] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[0] + +(temp[1]+'1')),limitWidth);break;
                             case 'Top': previous[1] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[1] + +(temp[1]+'1')),limitHeight);break;
                         }
                         if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]){
                             if(gameManager.gameMap.onDirectionEvent(previous)){
-                                gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,'smooth');
+                                gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,true);
                                 gameManager.gameMap.onPointEvent(previous);
                             }
                         }
@@ -126,17 +130,16 @@ window.onload = function(){
             // .array 单位区块子元素集合
             // .zone 地图通行区域
             // .loader 加载地图通行区域
-            const mapBoard = gameMap.board = {zone: undefined};
+            const mapBoard = gameMap.board = {zone: undefined,array: []};
             mapBoard.self = document.getElementById('gameMapBoard');
             for(let i = mapHeight; i > 0; i--){
                 let temp = mapBoard.self.insertAdjacentElement('beforeend',document.createElement('div'));
                 for(let i = mapWidth; i > 0; i--){
-                    temp.insertAdjacentElement('beforeend',document.createElement('div'));
+                    mapBoard.array.push(temp.insertAdjacentElement('beforeend',document.createElement('div')));
                 }
             }
             mapBoard.self.style.width = gameMap.mapConcat[0].width+'px';
             mapBoard.self.classList.remove('disappear');
-            mapBoard.array = Array.from(mapBoard.self.querySelectorAll('div>div>div'));
             mapBoard.loader = function(boardZoneArray){
                 this.zone = [];
                 for(let i in boardZoneArray){
@@ -182,7 +185,8 @@ window.onload = function(){
         // .loader 加载主角方位
         const gamePlayer = gameManager.gamePlayer = {
             id: undefined,xyz: undefined,object: undefined,display: undefined,self: document.getElementById('player'),
-            loader(id,xyz,behavior){
+            loader(id,xyz,isFocus = false){
+                const moveKeyframe = gameManager.constTemp.moveKeyframes[0];
                 if(this.id !== id){
                     this.id = id;
                     this.object = objectArray.characterArray.get(id);
@@ -191,28 +195,28 @@ window.onload = function(){
                     temp.src = this.object.display;
                     temp.onload=()=>{gameManager.gameFileSL.origin[0].id = id;this.display.getContext('2d').drawImage(temp,0,0);};
                 }
+                this.xyz = xyz.concat();
                 if(!this.xyz || this.xyz[2] !== xyz[2]){ 
                     this.self.style.zIndex = xyz[2];
                     gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][xyz[2]]);
                 }
-                this.self.animate([{marginLeft: xyz[0] * singleStepLength+'px',marginTop: xyz[1] * singleStepLength+'px'}],{duration: 66,fill: 'both'});
-                this.xyz = xyz.concat();
-                behavior && setTimeout(()=>this.focus(behavior),66);
+                moveKeyframe.marginLeft = xyz[0] * singleStepLength+'px',moveKeyframe.marginTop = xyz[1] * singleStepLength+'px';
+                isFocus && this.focus();
+                return this.self.animate(moveKeyframe,gameManager.constTemp.moveConfig).finished;
             },
-            focus(behavior){
+            focus(){
                 const windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
                 const windowHeight = windowWidth * 9/16;
-                window.scrollTo({
-                    left: Math.min(
-                        Math.max(0,this.self.offsetLeft - (windowWidth - singleStepLength) / 2),
-                        mapPositionWidth - windowWidth
-                    ),
-                    top: Math.min(
-                        Math.max(0,this.self.offsetTop - (windowHeight - singleStepLength) / 2),
-                        mapPositionHeight - windowHeight
-                    ),
-                    behavior: behavior
-                });
+                const gameBodyKeyframes = gameManager.constTemp.gameBodyKeyframes[0];
+                gameBodyKeyframes.marginLeft = -Math.min(
+                    Math.max(0,singleStepLength * this.xyz[0] - (windowWidth - singleStepLength) / 2),
+                    mapPositionWidth - windowWidth
+                )+'px',
+                gameBodyKeyframes.marginTop = -Math.min(
+                    Math.max(0,singleStepLength * this.xyz[1] - (windowHeight - singleStepLength) / 2),
+                    mapPositionHeight - windowHeight
+                )+'px';
+                gameManager.gameBody.self.animate(gameBodyKeyframes,gameManager.constTemp.moveConfig);
             }
         };
         {
@@ -299,7 +303,7 @@ window.onload = function(){
                 gameManager.gameMap.loader(temp.mapID);
                 gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][temp.xyz[2]]);
                 gameManager.gameMap.objectManager.characterLoader(gameManager.gameMap.mapInfo[2]);
-                gameManager.gamePlayer.loader(temp.id,temp.xyz,'smooth');
+                gameManager.gamePlayer.loader(temp.id,temp.xyz,true);
                 gameManager.gameBody.menu.classList.add('disappear');
                 gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz:gameManager.gamePlayer.xyz});
             },
@@ -471,15 +475,15 @@ window.onload = function(){
             let temp;
             switch(temp = e.target.parentElement.parentElement.id){
                 case 'gameMapBoard':{
-                    let x = (temp = gameManager.gameMap.board.array.indexOf(e.target)) % mapWidth;
-                    let y = Math.floor(temp / mapWidth);
-                    if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[y][x]){
-                        gameManager.gamePlayer.self.animate([
-                            {marginLeft: (gameManager.gamePlayer.xyz[0] = x) * singleStepLength+'px',
-                            marginTop: (gameManager.gamePlayer.xyz[1] = y) * singleStepLength+'px'}
-                        ],{duration: 66,fill: 'both'});
+                    const previous = [
+                        (temp = gameManager.gameMap.board.array.indexOf(e.target)) % mapWidth,
+                        Math.floor(temp / mapWidth),
+                        gameManager.gamePlayer.xyz[2]
+                    ];
+                    console.log(gameManager.gameMap.board.array.indexOf(e.target),previous);
+                    if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]){
+                        gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous).then(()=>gameManager.gamePlayer.focus());
                     }
-                    setTimeout(()=>gameManager.gamePlayer.focus('smooth'),60);
                     break;
                 }
                 default:;
@@ -599,17 +603,17 @@ window.onload = function(){
             // key2move
             if(gameManager.gameBody.menu.className){
                 switch(e.key){
-                    case 'a':gameManager.moveDiraction.a = ['Left','-'];break;
-                    case 's':gameManager.moveDiraction.s = ['Top','+'];break;
-                    case 'd':gameManager.moveDiraction.d = ['Left','+'];break;
-                    case 'w':gameManager.moveDiraction.w = ['Top','-'];break;
+                    case 'a':gameManager.constTemp.moveDiraction.a = ['Left','-'];break;
+                    case 's':gameManager.constTemp.moveDiraction.s = ['Top','+'];break;
+                    case 'd':gameManager.constTemp.moveDiraction.d = ['Left','+'];break;
+                    case 'w':gameManager.constTemp.moveDiraction.w = ['Top','-'];break;
                 }
             }
         },true);
         document.addEventListener('keyup',function(e){
             // stop&sth.
             let temp;
-            delete gameManager.moveDiraction[e.key];
+            delete gameManager.constTemp.moveDiraction[e.key];
             switch(e.key){
                 case 'c':gameManager.gamePlayer.photo.self.classList.toggle('disappear');break;
                 case 'q':gameManager.gameMessage.self.classList.toggle('disappear');break;

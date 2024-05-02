@@ -10,7 +10,7 @@
                     let temp;
                     if(undertaleManager.fighter.id !== undefined){
                         const previous = [undertaleManager.fighter.x,undertaleManager.fighter.y];
-                        if(temp = Object.values(window.gameManager.moveDiraction).at(-1)){
+                        if(temp = Object.values(window.gameManager.constTemp.moveDiraction).at(-1)){
                             switch(temp[0]){
                                 case 'Left': previous[0] = Math.min(Math.max(0,undertaleManager.fighter.x + +(temp[1]+'0.1')),50);break;
                                 case 'Top': previous[1] = Math.min(Math.max(0,undertaleManager.fighter.y + +(temp[1]+'0.1')),50);break;
@@ -70,12 +70,14 @@
                     id: 1,object: undefined,x: 25,y: 25,
                     self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighter'})),
                     loader(id,x,y){
+                        const moveKeyframe = window.gameManager.constTemp.moveKeyframes[0];
                         if(this.id !== id){
                             this.id = id;
                             this.object = objectArray.characterArray.get(id);
                             this.display.style.backgroundImage = `url(${this.object.display})`;
                         }
-                        this.self.animate([{marginLeft: (this.x = x)+'vw',marginTop: (this.y = y)+'vw'}],{duration: 33,fill: 'both'});
+                        moveKeyframe.marginLeft = (this.x = x)+'vw',moveKeyframe.marginTop = (this.y = y)+'vw';
+                        this.self.animate(moveKeyframe,window.gameManager.constTemp.UTmoveConfig);
                     }
                 };
                 fighter.display = fighter.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighterDisplay'}));

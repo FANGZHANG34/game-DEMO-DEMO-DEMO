@@ -12,21 +12,23 @@
     <script src="./js/map.js" type="text/javascript"></script>
     <script src="./js/default-config-save.js" type="text/javascript"></script>
     <script src="./js/main1.js" type="text/javascript"></script>
-    <!-- 上面的link、script是基础模块，下面的link、script扩展模块 -->
+    <!-- 上面的link、script是基础模块，下面的link、script是扩展模块 -->
     <link rel="stylesheet" href="./css/1.css" type="text/css" as="style" id="style1"/>
     <script src="./js/extension/skill.js" type="text/javascript"></script>
     <script src="./js/extension/item.js" type="text/javascript"></script>
     <script src="./js/extension/undertale-like-system.js" type="text/javascript"></script>
 </head>
-<body id="gameBody">
+<body>
     <div id="gameBorder"></div>
-    <canvas id="map0" class="mapImg"></canvas>
-    <canvas id="map1" class="mapImg"></canvas>
-    <canvas id="map2" class="mapImg"></canvas>
-    <canvas id="map3" class="mapImg"></canvas>
-    <div id="player"></div>
+    <div id="gameBody">
+        <canvas id="map0" class="mapImg"></canvas>
+        <canvas id="map1" class="mapImg"></canvas>
+        <canvas id="map2" class="mapImg"></canvas>
+        <canvas id="map3" class="mapImg"></canvas>
+        <div id="player"></div>
+        <div id="gameMapBoard" class="disappear"></div>
+    </div>
     <canvas id="playerPhoto"></canvas>
-    <div id="gameMapBoard" class="disappear"></div>
     <canvas id="messageImage" class="disappear"></canvas>
     <video id="messageVideo" class="disappear"></video>
     <div id="gameMessage" class="disappear">
@@ -101,7 +103,7 @@
                 <div id="loadSL">读取</div><div id="saveSL">写入</div><div id="deleteSL">删除</div>
                 <pre></pre>
             </div><div id="myGallery" class="disappear">
-                <img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode"><img class="galleryNode">
+                <img title="0" class="galleryNode"><img title="0" class="galleryNode"><img title="0" class="galleryNode"><img title="0" class="galleryNode"><img title="0" class="galleryNode"><img title="0" class="galleryNode">
             </div><div id="myConfig" class="disappear"><div>
                     <div id="saveConfig">应用</div><div id="resetConfig">重置</div>
                 </div><div id="globalVolume">
