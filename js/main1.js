@@ -32,16 +32,16 @@ window.onload = function(){
         playerMove:{
             intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,
             defaultFn: ()=>{
-                const [limitWidth,limitHeight] = [mapWidth-1,mapHeight-1];
-                let temp;
                 if(gameManager.gamePlayer.id !== undefined){
                     const previous = gameManager.gamePlayer.xyz.concat();
+                    let temp,i;
                     if(temp = Object.values(gameManager.constTemp.moveDiraction).at(-1)){
                         switch(temp[0]){
-                            case 'Left': previous[0] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[0] + +(temp[1]+'1')),limitWidth);break;
-                            case 'Top': previous[1] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[1] + +(temp[1]+'1')),limitHeight);break;
+                            case 'Left': previous[i = 0] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[0] + +(temp[1]+'1')),limitWidth);break;
+                            case 'Top': previous[i = 1] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[1] + +(temp[1]+'1')),limitHeight);break;
                         }
-                        if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]){
+                        if(previous[i] === gameManager.gamePlayer.xyz[i]){return;}
+                        else if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]){
                             if(gameManager.gameMap.onDirectionEvent(previous)){
                                 gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,true);
                                 gameManager.gameMap.onPointEvent(previous);
@@ -60,6 +60,7 @@ window.onload = function(){
     const configArray = JSON.parse(LZString.decompress(localStorage.getItem('configArray')));
     const singleStepLength = 60;
     const [mapWidth,mapHeight] = [32,18];
+    const [limitWidth,limitHeight] = [mapWidth-1,mapHeight-1];
     const [mapPositionWidth,mapPositionHeight] = [mapWidth * singleStepLength,mapHeight * singleStepLength];
 
     // *.self *的本体元素
@@ -109,18 +110,19 @@ window.onload = function(){
                 setTimeout(()=>{gameManager.gameFileSL.origin[0].mapID = mapID;});
             },
             onDirectionEvent(xyz){
-                for(let nodeCharacter of Object.values(this.objectManager.nodeArray)){
-                    let temp = nodeCharacter.xyz.concat();
-                    for(let i of xyz){if(temp.shift() !== i){return true;}}
-                    (temp = this.objectManager.characterArray[nodeCharacter.id]).selfEvent && temp.selfEvent();
+                nodeArrayLoop:for(let nodeCharacter of Object.values(this.objectManager.nodeArray)){
+                    let temp = nodeCharacter.xyz;
+                    for(let i = 0;i < 3;i++){if(temp[i] !== xyz[i]){continue nodeArrayLoop;}}
+                    (temp = this.objectManager.characterArray[nodeCharacter.id]).selfEvent?.();
                     return temp.zone;
                 };
                 return true;
             },
             onPointEvent(xyz){
-                for(let i of this.mapInfo[3]){
-                    if(!((xyz[0] === null || xyz[0] === i[0]) && (xyz[1] === null || xyz[1] === i[1]) && (xyz[2] === null || xyz[2] === i[2])))
-                    {continue;}else{objectArray.eventArray.get(i[3])[1]();return;}
+                mapEventLoop:for(let eventInfo of this.mapInfo[3]){
+                    for(let i = 0;i < 3;i++){if(eventInfo[i] !== xyz[i] && eventInfo[i] !== null){continue mapEventLoop;}}
+                    objectArray.eventArray.get(eventInfo[3])[1]();
+                    return;
                 }
             }
         };
@@ -163,9 +165,9 @@ window.onload = function(){
                     for(let object of characterInfoArray){
                         let temp = object.id;
                         this.characterArray[temp] = objectArray.characterArray.get(temp);
-                        temp = this.nodeArray[temp] = Object.assign({},gameManager.gamePlayer,{id: undefined,self: this.nodeTemp.cloneNode(true),photo: undefined});
+                        temp = this.nodeArray[temp] = Object.assign({},gameManager.gamePlayer,{id: undefined,xyz: [],self: this.nodeTemp.cloneNode(true),photo: undefined});
                         temp.loader(object.id,object.xyz);
-                        gameManager.gamePlayer.self.insertAdjacentElement('afterend',temp.self);
+                        gameManager.gamePlayer.self.insertAdjacentElement('beforebegin',temp.self);
                     }
                 }
             };
@@ -184,7 +186,7 @@ window.onload = function(){
         // .xyz 主角方位
         // .loader 加载主角方位
         const gamePlayer = gameManager.gamePlayer = {
-            id: undefined,xyz: undefined,object: undefined,display: undefined,self: document.getElementById('player'),
+            id: undefined,xyz: [],object: undefined,display: undefined,self: document.getElementById('player'),
             loader(id,xyz,isFocus = false){
                 const moveKeyframe = gameManager.constTemp.moveKeyframes[0];
                 if(this.id !== id){
@@ -193,15 +195,19 @@ window.onload = function(){
                     this.display = this.self.firstChild;
                     let temp = new Image();
                     temp.src = this.object.display;
-                    temp.onload=()=>{gameManager.gameFileSL.origin[0].id = id;this.display.getContext('2d').drawImage(temp,0,0);};
+                    temp.onload=()=>{this.display.getContext('2d').drawImage(temp,0,0);};
                 }
-                this.xyz = xyz.concat();
-                if(!this.xyz || this.xyz[2] !== xyz[2]){ 
-                    this.self.style.zIndex = xyz[2];
-                    gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][xyz[2]]);
+                if(xyz){
+                    for(let i = 0;i < 3;i++){this.xyz[i] = xyz[i];}
+                    if(!this.self.style.zIndex || +this.self.style.zIndex !== xyz[2]){this.self.style.zIndex = String(xyz[2]);}
+                    moveKeyframe.marginLeft = xyz[0] * singleStepLength+'px',moveKeyframe.marginTop = xyz[1] * singleStepLength+'px';
                 }
-                moveKeyframe.marginLeft = xyz[0] * singleStepLength+'px',moveKeyframe.marginTop = xyz[1] * singleStepLength+'px';
                 isFocus && this.focus();
+                if(this === gamePlayer){
+                    gameManager.gameFileSL.origin[0].id = id;
+                    this.photo.temp.src = this.object.photo;
+                    xyz && gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][xyz[2]]);
+                }
                 return this.self.animate(moveKeyframe,gameManager.constTemp.moveConfig).finished;
             },
             focus(){
@@ -230,11 +236,11 @@ window.onload = function(){
                 self: document.getElementById('playerPhoto'),
                 temp: new Image()
             };
+            gamePlayerPhoto.self.height = 2025;
             gamePlayerPhoto.content = gamePlayerPhoto.self.getContext('2d');
-            gamePlayerPhoto.temp.src = './img/actor0.jpg';
+            // gamePlayerPhoto.temp.src = './img/actor0.jpg';
             gamePlayerPhoto.temp.onload = ()=>{
                 gamePlayerPhoto.self.width = 720;
-                gamePlayerPhoto.self.height = 2025;
                 gamePlayerPhoto.content.drawImage(gamePlayerPhoto.temp,0,0);
             }
         }
@@ -288,7 +294,7 @@ window.onload = function(){
         const gameInfoSL = gameManager.gameInfoSL = {
             temp: undefined,index: undefined,
             self: document.getElementById('infoSL'),
-            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],memory: {characterArray: {},itemList: {},maprDateArray: {}}},
+            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],memory: {itemList: {onceArray: {},twiceceArray: {},onfitArray: {}},characterArray: {},maprDateArray: {}}},
             nowInfoSL0: {mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
             shower(){
                 this.stage.textContent = this.index === '0' ? '当前信息（自动更新，只能读取）：' : '信息：';
@@ -299,13 +305,12 @@ window.onload = function(){
             },
             loader(){
                 let temp = this.temp || this.saveDataTemp;
-                gameManager.gameFileSL.origin[0] = null;
+                gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz: gameManager.gamePlayer.xyz});
                 gameManager.gameMap.loader(temp.mapID);
                 gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][temp.xyz[2]]);
                 gameManager.gameMap.objectManager.characterLoader(gameManager.gameMap.mapInfo[2]);
                 gameManager.gamePlayer.loader(temp.id,temp.xyz,true);
                 gameManager.gameBody.menu.classList.add('disappear');
-                gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz:gameManager.gamePlayer.xyz});
             },
             saver(){
                 if(gameManager.gameMap.mapID){
@@ -480,7 +485,6 @@ window.onload = function(){
                         Math.floor(temp / mapWidth),
                         gameManager.gamePlayer.xyz[2]
                     ];
-                    console.log(gameManager.gameMap.board.array.indexOf(e.target),previous);
                     if(!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]){
                         gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous).then(()=>gameManager.gamePlayer.focus());
                     }
@@ -631,5 +635,6 @@ window.onload = function(){
             }
         })
     }
-    setTimeout(()=>{document.documentElement.scrollTo(0,0);},66);
+    console.clear();
+    setTimeout(()=>{gameManager.gameBody.self.animate([{marginLeft:'0',marginTop:'0'}],gameManager.constTemp.moveConfig);});
 }

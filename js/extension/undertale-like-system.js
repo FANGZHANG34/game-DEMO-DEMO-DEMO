@@ -60,7 +60,7 @@
                         for(let i in this.nodeArray){this.nodeArray[i].remove();}
                         this.array = {};
                         this.nodeArray = {};
-                        const enemy = Object.assign(objectArray.characterArray.get(enemyID),undertaleManager.fighterCondition.allMemory.object[enemyID]);
+                        const enemy = Object.assign(objectArray.characterArray.get(enemyID),undertaleManager.tempMemory.object[enemyID]);
                     },
                     mover(){}
                 };

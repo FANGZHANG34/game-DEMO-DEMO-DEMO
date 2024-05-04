@@ -75,11 +75,26 @@ function getRandomDiractionUT(){
     let temp = String(Math.random()).slice(2,4);
     return [temp.charAt(0) > 4 ? 'Left' : 'Top',temp.charAt(1) > 4 ? '+' : '-'];
 }
-// readMemory 世界记忆操作
-function memoryHandle(pathString = 'characterArray.0.name',valueFn = (key1value,key2value)=>[key1value,key2value]){
+// memoryHandle 记忆信息操作
+function memoryHandle(thisMemory,pathString = 'characterArray.0.name',valueFn = (value,parentObject)=>[value,parentObject]){
     // 'pathString' example:
-    // 'characterArray.0.name' =>  || objectArray['characterArray'].get(0).name
-    // 'mapDataArray.001.0' =>  || mapDataArray.get('001')['0']
-    let temp = pathString.split('.');
-    
+    // 'characterArray.0.name' => thisMemory['characterArray']['0']?.['name'] || objectArray['characterArray'].get(0)['name']
+    // 'mapDataArray.001.0' => thisMemory['mapDataArray']['001']?.['0'] || mapDataArray.get('001')['0']
+    // 'itemList.onceArray.绷带' => thisMemory['itemList']['onceArray']['绷带']
+    const temp = pathString.split('.');
+    let value,parentObject;
+    switch(temp[0]){
+        case 'characterArray':{
+            value = (parentObject = thisMemory.characterArray[temp[1]])?.[temp[2]] ||
+            (parentObject = objectArray.characterArray.get(temp[1]))[temp[2]];
+            break;
+        }
+        case 'mapDataArray':{
+            value = (parentObject = thisMemory.mapDataArray[temp[1]])?.[temp[2]] ||
+            (parentObject = mapDataArray.get(temp[1]))[temp[2]];
+            break;
+        }
+        case 'itemList':value = (parentObject = thisMemory.itemList[temp[1]])[temp[2]];break;
+    }
+    return valueFn(value,parentObject);
 }

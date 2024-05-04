@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    transition-duration: 200ms;
+    /* transition-duration: 200ms; */
 }:root{
     --mapWidth: 1920px;
 }html{
@@ -14,7 +14,7 @@
 }hr{
     border: solid 1px white;
 }.disappear{
-    display: none !important;
+    /* display: none !important; */
     visibility: hidden;
 }::-webkit-scrollbar{
     display: none;
