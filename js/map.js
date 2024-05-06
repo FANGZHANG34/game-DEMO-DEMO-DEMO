@@ -1,5 +1,5 @@
-const mapDateArray = new Map();
-mapDateArray.set('001',[
+const mapDataArray = new Map();
+mapDataArray.set('001',[
     ["bg"],[
         [
             //         1         2         3         4         5  n      6         7

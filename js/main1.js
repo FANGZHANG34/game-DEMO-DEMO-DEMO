@@ -52,12 +52,16 @@ window.onload = function(){
             }
         }
     };
-    
+
     // configArray 本地配置
+    // mouseAudio 鼠标音效对象
     // singleStepLength 单位长度
     // mapWidth,mapHeight 地图相对长度
-    // moveDiraction 方向
+    // limitWidth,limitHeight 地图坐标限制
+    // mapPositionWidth,mapPositionHeight 地图实际长度
     const configArray = JSON.parse(LZString.decompress(localStorage.getItem('configArray')));
+    const mouseAudio = new Audio('./audio/1.ogg');
+    mouseAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
     const singleStepLength = 60;
     const [mapWidth,mapHeight] = [32,18];
     const [limitWidth,limitHeight] = [mapWidth-1,mapHeight-1];
@@ -98,7 +102,7 @@ window.onload = function(){
             mapConcat: Array.from(document.getElementsByClassName('mapImg')),
             loader(mapID){
                 this.mapID = mapID;
-                this.mapInfo = mapDateArray.get(mapID);
+                this.mapInfo = mapDataArray.get(mapID);
                 for(let i = 0; i<4; i++){
                     if(this.mapInfo[0][i]){
                         let temp = new Image();
@@ -248,7 +252,7 @@ window.onload = function(){
     console.log(3);
     {
         // 设置循环计时器
-        gameManager.setGameInterval('globalProcess',66);
+        gameManager.setGameInterval('globalProcess',100);
         gameManager.setGameInterval('playerMove',66);
         gameManager.setGameInterval('dialogueProcess',66);
         gameManager.setGameInterval('tempProcess',100);
@@ -294,8 +298,7 @@ window.onload = function(){
         const gameInfoSL = gameManager.gameInfoSL = {
             temp: undefined,index: undefined,
             self: document.getElementById('infoSL'),
-            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],memory: {itemList: {onceArray: {},twiceceArray: {},onfitArray: {}},characterArray: {},maprDateArray: {}}},
-            nowInfoSL0: {mapID: undefined,id: undefined,xyz: undefined,item: undefined,partner: undefined,switch: undefined,memory: undefined},
+            saveDataTemp: {mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],record: {},memory: {itemList: {onceArray: {},twiceceArray: {},onfitArray: {}},characterArray: {},mapDataArray: {}}},
             shower(){
                 this.stage.textContent = this.index === '0' ? '当前信息（自动更新，只能读取）：' : '信息：';
                 if(gameManager.gameInfoSL.temp){
@@ -600,6 +603,12 @@ window.onload = function(){
                     break;
                 }
                 default:console.log(temp);
+            }
+        },true);
+        document.addEventListener('mouseenter',function(e){
+            // mouseAudio
+            if(['option','SL','messageDialogue','messageChoice'].includes(e.target.parentElement?.id)){
+                mouseAudio.currentTime = 0,mouseAudio.play();
             }
         },true);
 

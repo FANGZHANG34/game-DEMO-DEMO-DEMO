@@ -6,6 +6,7 @@
 }:root{
     --mapWidth: 1920px;
 }html{
+    cursor: default;
     background-color: black;
 }body{
     width: 100vw;
@@ -18,6 +19,18 @@
     visibility: hidden;
 }::-webkit-scrollbar{
     display: none;
+}
+/*开始界面*/
+#startGame{
+    position: fixed;
+    width: 100vw;
+    height:  56.25vw;
+    text-align: center;
+    align-content: center;
+    background-color: #000;
+    font-size: 10vw;
+    color: #090;
+    z-index: 10;
 }
 /*挡板*/
 #gameBorder{

@@ -7,7 +7,7 @@ if(!localStorage.getItem('configArray')){
     })));
 }
 if(!localStorage.getItem('saveDataArray')){
-    let temp = [{mapID:"001",id:0,xyz:[16,9,0],partner:{},switch:[],memory:{characterArray:{},itemList:{},maprDateArray:{}}}];
+    let temp = [{mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],record: {},memory: {itemList: {onceArray: {},twiceceArray: {},onfitArray: {}},characterArray: {},mapDataArray: {}}}];
     for(let i = 1; i < 21;i++){temp[i] = 0;}
     localStorage.setItem('saveDataArray',LZString.compress(JSON.stringify(temp)));
 }
