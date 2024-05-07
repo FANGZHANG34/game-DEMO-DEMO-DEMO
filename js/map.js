@@ -95,7 +95,8 @@ mapDataArray.set('001',[
         [0,0,null,'1'],
         [1,0,null,'2'],
         [2,0,null,'3'],
-        [3,0,null,'4']
+        [3,0,null,'4'],
+        [4,0,null,'5']
     ],
-    objectArray.eventArray.get('0')[1]
+    '0'
 ]);

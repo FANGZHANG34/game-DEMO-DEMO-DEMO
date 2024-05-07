@@ -93,6 +93,10 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
         '战斗',()=>{
             window.gameManager.undertaleManager.loader();
         }
+    ]).set('5',[
+        '换人',()=>{
+            window.gameManager.gamePlayer.loader(1,[5,4,1],true);
+        }
     ])
     .forEach(function(value,key){this[key] = value[0];},objectArray.eventArray.list = {});
 }

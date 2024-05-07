@@ -76,35 +76,44 @@ function getRandomDiractionUT(){
     return [temp.charAt(0) > 4 ? 'Left' : 'Top',temp.charAt(1) > 4 ? '+' : '-'];
 }
 // memoryHandle 记忆信息操作
-function memoryHandle(thisMemory,mode = 'r',pathString = 'characterArray.0.name',value_fn = (parentObject,myKey)=>parentObject[myKey]){
+function memoryHandle(
+    pathString = 'characterArray.0.name',mode = 'r',value_fn = (parentObject,key2)=>parentObject[key2],
+    thisMemory = window.gameManager.constTemp.memory
+){
     // thisMemory do mode at pathString some time with value_fn.
     // 'pathString' example:
     // 'characterArray.0.name' => thisMemory['characterArray']['0']?.['name'] || objectArray['characterArray'].get(0)['name']
     // 'mapDataArray.001.0' => thisMemory['mapDataArray']['001']?.['0'] || mapDataArray.get('001')['0']
     // 'itemList.onceArray.绷带' => thisMemory['itemList']['onceArray']['绷带']
-    const temp = pathString.split('.'),myKey = temp[2];
-    let value,parentObject;
+    const [key0,key1,key2] = pathString.split('.');
+    let parentObject;
     switch(mode){
         case 'r':{
-            switch(temp[0]){
-                case 'characterArray':{
-                    return (parentObject = thisMemory.characterArray[temp[1]])?.[myKey] ||
-                    (parentObject = objectArray.characterArray.get(+temp[1]))[myKey];
+            if(key1){
+                switch(key0){
+                    case 'characterArray':{
+                        return key2 ? (parentObject = thisMemory.characterArray[key1])?.[key2] ||
+                        (parentObject = objectArray.characterArray.get(+key1))[key2] : parentObject;
+                    }
+                    case 'mapDataArray':{
+                        return key2 ? (parentObject = thisMemory.mapDataArray[key1])?.[key2] ||
+                        (parentObject = mapDataArray.get(key1))[key2] : parentObject;
+                    }
+                    case 'itemList':return key2 ? (parentObject = thisMemory.itemList[key1])[key2] : parentObject;
+                    default:throw new Error(`=> Memory has no '${key0}' !`);
                 }
-                case 'mapDataArray':{
-                    return value = (parentObject = thisMemory.mapDataArray[temp[1]])?.[myKey] ||
-                    (parentObject = mapDataArray.get(temp[1]))[myKey];
-                }
-                case 'itemList':return value = (parentObject = thisMemory.itemList[temp[1]])[myKey];
-                default:throw new Error(`=> Memory has no '${temp[0]}' !`);
-            }
+            }else{throw new Error('=> Need longer pathString !');}
         }
         case 'w':{
-            if(temp[0] in thisMemory){
-                return (parentObject = thisMemory[temp[0]][temp[1]] ??= {})[myKey] = value_fn;
-            }else{throw new Error(`=> Memory has no '${temp[0]}' !`);}
+            if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
+            else if(key0 in thisMemory){
+                return (parentObject = thisMemory[key0][key1] ??= {})[key2] = value_fn;
+            }else{throw new Error(`=> Memory has no '${key0}' !`);}
         }
-        case 'fn':return value_fn?.(parentObject,myKey);
+        case 'fn':{
+            if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
+            else{return value_fn?.(parentObject,key2)};
+        }
         default:throw new Error(`=> What is the mode '${mode}' ?`);
     }
 }
