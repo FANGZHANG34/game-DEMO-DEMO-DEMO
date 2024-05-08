@@ -101,15 +101,14 @@ window.onload = function(){
         // .loader 加载地图
         // .mapConcat 地图元素集合
         const gameMap = gameManager.gameMap = {
-            mapID: undefined,mapInfo: undefined,
+            mapID: undefined,
             mapConcat: Array.from(document.getElementsByClassName('mapImg')),
             loader(mapID){
-                this.mapID = mapID;
-                this.mapInfo = mapDataArray.get(mapID);
+                const mapInfo = memoryHandle('mapDataArray.'+(this.mapID = mapID)+'.0');
                 for(let i = 0; i<4; i++){
-                    if(this.mapInfo[0][i]){
+                    if(mapInfo[i]){
                         let temp = new Image();
-                        temp.src = './img/'+this.mapInfo[0][i]+'.png';
+                        temp.src = './img/'+mapInfo[i]+'.png';
                         temp.onload=()=>gameMap.mapConcat[i].getContext('2d').drawImage(temp,0,0);
                     }
                 }
@@ -127,7 +126,7 @@ window.onload = function(){
                 return true;
             },
             onPointEvent(xyz){
-                mapEventLoop:for(let eventInfo of this.mapInfo[3]){
+                mapEventLoop:for(let eventInfo of memoryHandle('mapDataArray.'+this.mapID+'.3')){
                     for(let i = 0;i < 3;i++){if(eventInfo[i] !== xyz[i] && eventInfo[i] !== null){continue mapEventLoop;}}
                     objectArray.eventArray.get(eventInfo[3])[1]();
                     return;
@@ -165,14 +164,12 @@ window.onload = function(){
             // .nodeTemp 地图对象元素模板
             // .loader 加载地图对象
             const mapObjectManager = gameMap.objectManager = {
-                characterArray: undefined,nodeArray: {},
+                nodeArray: {},
                 characterLoader(characterInfoArray){
                     for(let i in this.nodeArray){this.nodeArray[i].remove();}
-                    this.characterArray = {};
                     this.nodeArray = {};
                     for(let object of characterInfoArray){
                         let temp = object.id;
-                        this.characterArray[temp] = objectArray.characterArray.get(temp);
                         temp = this.nodeArray[temp] = Object.assign({},gameManager.gamePlayer,{id: undefined,xyz: [],self: this.nodeTemp.cloneNode(true),photo: undefined});
                         temp.loader(object.id,object.xyz);
                         gameManager.gamePlayer.self.insertAdjacentElement('beforebegin',temp.self);
@@ -213,7 +210,7 @@ window.onload = function(){
                 if(this === gamePlayer){
                     gameManager.gameFileSL.origin[0].id = id;
                     this.photo.temp.src = memoryHandle('characterArray.'+id+'.photo','r');
-                    xyz && gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][xyz[2]]);
+                    xyz && gameManager.gameMap.board.loader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.1')[xyz[2]]);
                 }
                 return this.self.animate(moveKeyframe,gameManager.constTemp.moveConfig).finished;
             },
@@ -316,8 +313,8 @@ window.onload = function(){
                 let temp = this.temp || this.saveDataTemp;
                 gameManager.constTemp.memory = (gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz: gameManager.gamePlayer.xyz})).memory;
                 gameManager.gameMap.loader(temp.mapID);
-                gameManager.gameMap.board.loader(gameManager.gameMap.mapInfo[1][temp.xyz[2]]);
-                gameManager.gameMap.objectManager.characterLoader(gameManager.gameMap.mapInfo[2]);
+                gameManager.gameMap.board.loader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.1')[temp.xyz[2]]);
+                gameManager.gameMap.objectManager.characterLoader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.2'));
                 gameManager.gamePlayer.loader(temp.id,temp.xyz,true);
                 gameManager.gameBody.menu.classList.add('disappear');
             },
@@ -425,8 +422,7 @@ window.onload = function(){
                 clearMedia(this.audio);
             }
             content.loader = function(text,audioUrl,imageUrl,videoUrl){
-                this.video.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume;
-                this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume;
+                this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume;
                 this.textId && clearInterval(this.textId);
                 this.textId = undefined;
                 if(text){
@@ -592,6 +588,7 @@ window.onload = function(){
                             default:configArray.globalArray[i] = +temp.textContent / 100;
                         }
                     }
+                    hoverAudio.volume = clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
                     localStorage.setItem('configArray',LZString.compress(JSON.stringify(configArray)));
                     alert('设置保存成功！');config.click();
                     break;
@@ -607,6 +604,7 @@ window.onload = function(){
                             default:temp[1].textContent = temp[0] * 100;temp[2].scrollTop = (1 - temp[0]) * 1000;
                         }
                     }
+                    hoverAudio.volume = clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
                     break;
                 }
                 default:console.log(temp);

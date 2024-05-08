@@ -4,16 +4,6 @@
         oldWindowOnload();
         const undertaleManager = window.gameManager.undertaleManager = {
             body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: undefined,
-            Strength: class{
-                metier = undefined; LV = 0; EX = 0; R_EX = 0; 
-                HP = 300; MP = 100; HP_R = 300; MP_R = 100; 
-                AD = 10; AP = 0; C_AD = 10; C_AP = 0; 
-                AGI = 10; arms = undefined; armor = undefined; prop = undefined; 
-                buffArray = {}; debuffArray = {}; skillArray = {}; BG = undefined;
-                constructor(strengthLikeArray){
-                    for(let key in this){this[key] = strengthLikeArray[key];}
-                }
-            },
             undertaleProcess: window.gameManager.undertaleProcess = {
                 intervalID: undefined,timeSep: undefined,paused: true,onEvent: undefined,nowFn: undefined,
                 defaultFn: ()=>{
@@ -30,7 +20,7 @@
                     }
                 }
             },
-            loadTempMemory(){this.tempMemory = copyObj(window.gameManager.gameFileSL.origin['0'].memory)},
+            loadTempMemory(){this.tempMemory = copyObj(window.gameManager.constTemp.memory)},
             loader(enemyID,fighterID = window.gameManager.gamePlayer.id){
                 window.gameManager.playerMove.paused = true;
                 this.loadTempMemory();
@@ -70,7 +60,6 @@
                         for(let i in this.nodeArray){this.nodeArray[i].remove();}
                         this.array = {};
                         this.nodeArray = {};
-                        const enemy = Object.assign(objectArray.characterArray.get(enemyID),undertaleManager.tempMemory.object[enemyID]);
                     },
                     mover(){}
                 };
@@ -81,11 +70,7 @@
                     self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighter'})),
                     loader(id,x,y){
                         const moveKeyframe = window.gameManager.constTemp.moveKeyframes[0];
-                        if(this.id !== id){
-                            this.id = id;
-                            this.object = objectArray.characterArray.get(id);
-                            this.display.style.backgroundImage = `url(${this.object.display})`;
-                        }
+                        this.id === id || (this.display.style.backgroundImage = `url(${memoryHandle('characterArray.'+(this.id = id)+'.display')})`);
                         moveKeyframe.marginLeft = (this.x = x)+'vw',moveKeyframe.marginTop = (this.y = y)+'vw';
                         this.self.animate(moveKeyframe,window.gameManager.constTemp.UTmoveConfig);
                     }

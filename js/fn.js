@@ -7,8 +7,6 @@
 //     function g(){0>f||1<f||0>=d?a.scrollTop=c:(a.scrollTop=b-(b-c)*h(f),
 //     f+=d*e,setTimeout(g,e))}g()}(a,b,c,0,1/e,20,d))
 // }
-// nullFn 空函数
-function nullFn(){}
 // strN 数字转规范字符串
 function strN(N,longN){
     if(longN <= String(N).length){
@@ -87,33 +85,34 @@ function memoryHandle(
     // 'itemList.onceArray.绷带' => thisMemory['itemList']['onceArray']['绷带']
     const [key0,key1,key2] = pathString.split('.');
     let parentObject;
-    switch(mode){
-        case 'r':{
-            if(key1){
-                switch(key0){
-                    case 'characterArray':{
-                        return key2 ? (parentObject = thisMemory.characterArray[key1])?.[key2] ||
-                        (parentObject = objectArray.characterArray.get(+key1))[key2] : parentObject;
-                    }
-                    case 'mapDataArray':{
-                        return key2 ? (parentObject = thisMemory.mapDataArray[key1])?.[key2] ||
-                        (parentObject = mapDataArray.get(key1))[key2] : parentObject;
-                    }
-                    case 'itemList':return key2 ? (parentObject = thisMemory.itemList[key1])[key2] : parentObject;
-                    default:throw new Error(`=> Memory has no '${key0}' !`);
+    if(mode === 'r'){
+        if(key1){
+            switch(key0){
+                case 'characterArray':{
+                    return key2 ? (parentObject = thisMemory.characterArray[key1])?.[key2] ||
+                    (parentObject = objectArray.characterArray.get(+key1))[key2] : parentObject;
                 }
-            }else{throw new Error('=> Need longer pathString !');}
+                case 'mapDataArray':{
+                    return key2 ? (parentObject = thisMemory.mapDataArray[key1])?.[key2] ||
+                    (parentObject = mapDataArray.get(key1))[key2] : parentObject;
+                }
+                case 'itemList':return key2 ? (parentObject = thisMemory.itemList[key1])[key2] : parentObject;
+                default:throw new Error(`=> Memory has no '${key0}' !`);
+            }
+        }else{throw new Error('=> Need longer pathString !');}
+    }else{
+        parentObject = thisMemory[key0][key1] ??= {};
+        switch(mode){
+            case 'w':{
+                if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
+                else if(key0 in thisMemory){return parentObject[key2] = value_fn;}
+                else{throw new Error(`=> Memory has no '${key0}' !`);}
+            }
+            case 'fn':{
+                if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
+                else{return value_fn?.(parentObject,key2)};
+            }
+            default:throw new Error(`=> What is the mode '${mode}' ?`);
         }
-        case 'w':{
-            if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
-            else if(key0 in thisMemory){
-                return (parentObject = thisMemory[key0][key1] ??= {})[key2] = value_fn;
-            }else{throw new Error(`=> Memory has no '${key0}' !`);}
-        }
-        case 'fn':{
-            if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
-            else{return value_fn?.(parentObject,key2)};
-        }
-        default:throw new Error(`=> What is the mode '${mode}' ?`);
     }
 }

@@ -2,13 +2,7 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
 {
     objectArray.characterArray.set(0,{
         zone:false,
-        selfEvent:()=>{
-            window.gameManager.gameMessage.loader(
-                {name:'无名剑客',faceUrl:'./img/无名剑客.jpg'},
-                {text:
-`芝士雪豹`,audioUrl:'',videoUrl:'',imageUrl:''}
-            );
-        },
+        selfEvent:undefined,
         name:'无名剑客',
         display:'./img/无名剑客.jpg',
         face:'./img/无名剑客.jpg',

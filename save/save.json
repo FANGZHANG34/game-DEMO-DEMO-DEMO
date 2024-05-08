@@ -4,272 +4,44 @@
 		"id": 0,
 		"xyz": [
 			9,
-			5,
+			2,
 			0
 		],
-		"item": {},
-		"partner": {},
+		"partner": [],
 		"switch": [],
-		"memory": {}
+		"record": {},
+		"memory": {
+			"itemList": {
+				"onceArray": {},
+				"twiceceArray": {},
+				"onfitArray": {}
+			},
+			"characterArray": {
+				"1": {
+					"selfEvent": "4"
+				}
+			},
+			"mapDataArray": {}
+		}
 	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	},
-	{
-		"mapID": "001",
-		"id": 0,
-		"xyz": [
-			9,
-			5,
-			0
-		],
-		"item": {},
-		"partner": {},
-		"switch": [],
-		"memory": {}
-	}
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
 ]
