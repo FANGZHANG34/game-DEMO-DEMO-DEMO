@@ -16,11 +16,22 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 /* 状态栏 */
+#thisFighter{
+    background-color: #c6c;
+}
 #fighterConditionStage>div{
     height: 2.5vw;
 }#fighterHP,#fighterMP,#fighterCharge{
     margin-left: 10vw;
     width: 10vw;
+}#fighterThis{
+    width: 20vw;
+    overflow: scroll;
+    scroll-snap-type: y mandatory;
+}#fighterThis>div{
+    text-align: center;
+    align-content: center;
+    scroll-snap-align: start;
 }#fighterHP{
     background-color: #0c0;
 }#fighterMP{
@@ -29,9 +40,11 @@
     background-color: #ccc;
 }.fighterInfoName,.fighterInfoText{
     text-align: center;
+    vertical-align: top;
     width: 10vw;
     height: 2.5vw;
 }.fighterInfoName{
+    position: absolute;
     margin-left: -10vw;
 }#fighterBuff,#fighterDebuff{
     overflow: scroll;
@@ -53,7 +66,7 @@
     position: absolute;
     width: 0;
     height: 0;
-    border: solid 3.125vw red;
+    border: 3.125vw solid red;
 }.UTtheaterCorner{
     position: absolute;
     background-image: url(../img/林元.jpg);

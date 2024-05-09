@@ -13,7 +13,7 @@
     height: calc((var(--mapWidth) - 100vw) * 9 / 16 + 100vh);
     overflow: hidden;
 }hr{
-    border: solid 1px white;
+    border: 1px solid white;
 }.disappear{
     /* display: none !important; */
     visibility: hidden;
@@ -27,9 +27,18 @@
     height:  56.25vw;
     text-align: center;
     align-content: center;
-    background-color: #000;
+    background-color: #212;
     font-size: 10vw;
     color: #090;
+    z-index: 10;
+    line-height: 5vw;
+}
+/*游戏提示*/
+#gameTip{
+    position: fixed;
+    width: 20vw;
+    border: .5vw solid #ccc;
+    background-color: black;
     z-index: 10;
 }
 /*挡板*/
@@ -158,7 +167,7 @@
 }#menuBoard{
     width: 60vw;
     overflow: hidden;
-    border: solid calc(5vw / 12) rgba(225, 225, 225, 0.5);
+    border: calc(5vw / 12) solid rgba(225, 225, 225, 0.5);
 }#menuBoard>div{
     position: absolute;
     width: 60vw;

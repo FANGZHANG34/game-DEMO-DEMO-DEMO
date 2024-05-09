@@ -26,15 +26,15 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
         }
     }
     objectArray.eventArray.set('0',[
-        '开始',()=>{
+        '开始',(id = 1)=>{
             window.gameManager.gameMessage.loader(
-                {name:'林元',faceUrl:'./img/林元.jpg'},
+                {name: memoryHandle('characterArray.'+id+'.name'),faceUrl: memoryHandle('characterArray.'+id+'.face')},
                 {text:
 `想要做什么事？`,audioUrl:'',videoUrl:'',imageUr:''},
                 {
-                    '听歌':objectArray.eventArray.get('1')[1],
-                    '看片':objectArray.eventArray.get('2')[1],
-                    '看动画':objectArray.eventArray.get('3')[1],
+                    '听歌': objectArray.eventArray.get('1')[1],
+                    '看片': objectArray.eventArray.get('2')[1],
+                    '看动画': objectArray.eventArray.get('3')[1],
                     'NOTHING!!!':()=>{
                         window.gameManager.gameMessage.closer();
                         window.gameManager.playerMove.paused = false;
@@ -85,7 +85,7 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
         }
     ]).set('4',[
         '战斗',()=>{
-            window.gameManager.undertaleManager.loader();
+            window.gameManager.undertaleManager.loader(1);
         }
     ]).set('5',[
         '换人',()=>{

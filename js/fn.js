@@ -21,10 +21,10 @@ function clearMedia(mediaElement){
 }
 // copyObj 深复制对象
 function copyObj(obj = {}){
-    let newobj = null;
+    var newobj;
     if(obj instanceof Object && obj !== null){
         newobj = obj instanceof Array ? [] : {};
-        for (var i in obj) {newobj[i] = copyObj(obj[i]);}
+        for(var i in obj){i[0] === '_' || (newobj[i] = copyObj(obj[i]));}
     }else{newobj = obj;}
     return newobj;
 }
@@ -89,11 +89,11 @@ function memoryHandle(
         if(key1){
             switch(key0){
                 case 'characterArray':{
-                    return key2 ? (parentObject = thisMemory.characterArray[key1])?.[key2] ||
+                    return key2 ? (parentObject = thisMemory.characterArray[key1])?.[key2] ??
                     (parentObject = objectArray.characterArray.get(+key1))[key2] : parentObject;
                 }
                 case 'mapDataArray':{
-                    return key2 ? (parentObject = thisMemory.mapDataArray[key1])?.[key2] ||
+                    return key2 ? (parentObject = thisMemory.mapDataArray[key1])?.[key2] ??
                     (parentObject = mapDataArray.get(key1))[key2] : parentObject;
                 }
                 case 'itemList':return key2 ? (parentObject = thisMemory.itemList[key1])[key2] : parentObject;
