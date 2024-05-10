@@ -4,13 +4,16 @@ window.onload = function(){
     // 大多数游戏元素都有self属性以指向其本体HTMLElement
 
     // gameManager 游戏管理者，游戏基框架的集合对象
-    // .setGameInterval 设置游戏循环计时器的ID
+    // .setGameInterval() 设置游戏循环计时器的ID
     const gameManager = window.gameManager = {
         constTemp: {
             memory: undefined,
-            moveDiraction: {},moveKeyframes: [{marginLeft: undefined,marginTop: undefined}],
+            moveDiraction: {},
+            // moveKeyframes: [{marginLeft: undefined,marginTop: undefined}],
+            // gameBodyKeyframes: [{marginLeft: undefined,marginTop: undefined}],
+            moveKeyframes: [{marginLeft: undefined,marginTop: undefined}],
             gameBodyKeyframes: [{marginLeft: undefined,marginTop: undefined}],
-            moveConfig: {duration: 66,fill: 'forwards'},UTmoveConfig: {duration: 33,fill: 'forwards'}
+            moveConfig: {duration: 66,fill: 'forwards'}
         },
         setGameInterval(type,timeSep){
             let temp;
@@ -80,6 +83,7 @@ window.onload = function(){
         // .menuBoard 选项对应面板对象
         const gameBody = gameManager.gameBody = {
             self: document.getElementById('gameBody'),
+            gameTip: document.getElementById('gameTip'),
             menu: document.getElementById('menu'),
             menuBoard: {
                 self: document.getElementById('menuBoard'),
@@ -98,7 +102,7 @@ window.onload = function(){
     console.log(1);
     {
         // gameMap 游戏地图
-        // .loader 加载地图
+        // .loader() 加载地图
         // .mapConcat 地图元素集合
         const gameMap = gameManager.gameMap = {
             mapID: undefined,
@@ -112,16 +116,15 @@ window.onload = function(){
                         temp.onload=()=>gameMap.mapConcat[i].getContext('2d').drawImage(temp,0,0);
                     }
                 }
-                gameManager.globalProcess.nowFn = objectArray.eventArray.get(memoryHandle('mapDataArray.'+mapID+'.4'))[1];
+                gameManager.globalProcess.nowFn = objectArray.eventArray.get(memoryHandle('mapDataArray.'+mapID+'.4'))?.[1];
                 setTimeout(()=>{gameManager.gameFileSL.origin[0].mapID = mapID;});
             },
             onDirectionEvent(xyz){
                 nodeArrayLoop:for(let nodeCharacter of Object.values(this.objectManager.nodeArray)){
                     let temp = nodeCharacter.xyz;
                     for(let i = 0;i < 3;i++){if(temp[i] !== xyz[i]){continue nodeArrayLoop;}}
-                    console.log(memoryHandle('characterArray.'+nodeCharacter.id+'.selfEvent'));
-                    objectArray.eventArray.get(memoryHandle('characterArray.'+nodeCharacter.id+'.selfEvent') || '0')[1]();
-                    return memoryHandle('characterArray.'+nodeCharacter.id+'.zone');
+                    objectArray.eventArray.get(memoryHandle('characterArray.'+(temp = nodeCharacter.id)+'.selfEvent') || '0')[1](temp);
+                    return memoryHandle('characterArray.'+temp+'.zone');
                 };
                 return true;
             },
@@ -138,7 +141,7 @@ window.onload = function(){
             // mapBoard 地图面板
             // .array 单位区块子元素集合
             // .zone 地图通行区域
-            // .loader 加载地图通行区域
+            // .loader() 加载地图通行区域
             const mapBoard = gameMap.board = {zone: undefined,array: []};
             mapBoard.self = document.getElementById('gameMapBoard');
             for(let i = mapHeight; i > 0; i--){
@@ -162,11 +165,11 @@ window.onload = function(){
             // .array 地图对象集合
             // .nodeArray 地图对象元素集合
             // .nodeTemp 地图对象元素模板
-            // .loader 加载地图对象
+            // .loader() 加载地图对象
             const mapObjectManager = gameMap.objectManager = {
                 nodeArray: {},
                 characterLoader(characterInfoArray){
-                    for(let i in this.nodeArray){this.nodeArray[i].remove();}
+                    for(let i in this.nodeArray){this.nodeArray[i].self.remove();}
                     this.nodeArray = {};
                     for(let object of characterInfoArray){
                         let temp = object.id;
@@ -189,7 +192,7 @@ window.onload = function(){
         // .object 主角信息
         // .display 显现元素<canvas>
         // .xyz 主角方位
-        // .loader 加载主角方位
+        // .loader() 加载主角方位
         const gamePlayer = gameManager.gamePlayer = {
             id: undefined,xyz: [],display: undefined,self: document.getElementById('player'),
             loader(id,xyz,isFocus = false){
@@ -262,7 +265,7 @@ window.onload = function(){
         // gameFileSL 游戏存档
         // .origin 存档管理元素
         // .array 存档元素的子元素集合
-        // .importFileSL 加载存档元素的子元素集合
+        // .importFileSL() 加载存档元素的子元素集合
         const gameFileSL = gameManager.gameFileSL = {
             self: document.getElementById('SL'),
             origin: JSON.parse(LZString.decompress(localStorage.getItem('saveDataArray'))),
@@ -291,10 +294,10 @@ window.onload = function(){
         // .stage 当前存档浏览
         // .temp 当前存档信息
         // .saveDataTemp 用于替代的存档信息
-        // .shower 展示存档
-        // .loader 加载存档
-        // .saver 保存存档
-        // .deleter 保存存档
+        // .shower() 展示存档
+        // .loader() 加载存档
+        // .saver() 保存存档
+        // .deleter() 保存存档
         const gameInfoSL = gameManager.gameInfoSL = {
             temp: undefined,index: undefined,
             self: document.getElementById('infoSL'),
@@ -345,10 +348,10 @@ window.onload = function(){
     console.log(6);
     {
         // gameMessage 游戏消息
-        // .loader 加载
-        // .*.reset 重置
-        // .*.loader 加载
-        // .closer 关闭
+        // .loader() 加载
+        // .*.reset() 重置
+        // .*.loader() 加载
+        // .closer() 关闭
         const gameMessage = gameManager.gameMessage = {
             self: document.getElementById('gameMessage'),
             loader(senderObject = {},contentObject = {},choiceArray = {},finallyFn){
@@ -480,13 +483,31 @@ window.onload = function(){
     
     {
         // 交互设置
-        document.addEventListener('click',function(e){
+        document.addEventListener('mousemove',e=>{
+            // mouse2tip
+            const gameTip = gameManager.gameBody.gameTip,tipStyle = gameTip.style,tipFn = ()=>{
+                tipStyle.transform = `translate(${e.clientX + 32}px,${e.clientY + 18}px)`;
+                gameTip.className === 'disappear' && gameTip.classList.remove('disappear');
+            };
+            var temp = e.target;
+            switch(temp.parentElement?.id){
+                case 'fighterBuff':;
+                case 'fighterDebuff':{
+                    tipFn();break;
+                }
+                case 'fighterThis':{
+                    tipFn();break;
+                }
+                default:gameTip.className === 'disappear' || gameTip.classList.add('disappear');
+            }
+        },true);
+        document.addEventListener('click',e=>{
             // 三维click2move
-            let temp;
-            switch(temp = e.target.parentElement.parentElement.id){
+            var temp = e.target;
+            switch(temp.parentElement.parentElement.id){
                 case 'gameMapBoard':{
                     const previous = [
-                        (temp = gameManager.gameMap.board.array.indexOf(e.target)) % mapWidth,
+                        (temp = gameManager.gameMap.board.array.indexOf(temp)) % mapWidth,
                         Math.floor(temp / mapWidth),
                         gameManager.gamePlayer.xyz[2]
                     ];
@@ -498,20 +519,20 @@ window.onload = function(){
                 default:;
             }
         },true);
-        document.addEventListener('click',function(e){
+        document.addEventListener('click',e=>{
             // 二维click2move
-            let temp;
-            switch(temp = e.target.parentElement.id){
+            var temp = e.target;
+            switch(temp.parentElement.id){
                 case 'SL':{
-                    gameManager.gameInfoSL.temp = gameManager.gameFileSL.origin[gameManager.gameInfoSL.index = e.target.textContent.at(-1)];
+                    gameManager.gameInfoSL.temp = gameManager.gameFileSL.origin[gameManager.gameInfoSL.index = temp.textContent.at(-1)];
                     Array.prototype.forEach.call(gameManager.gameFileSL.array,x=>x.classList.remove('focus'));
-                    e.target.classList.add('focus');
+                    temp.classList.add('focus');
                     gameManager.gameInfoSL.shower();
                     break;
                 }
                 case 'option':{
                     Array.prototype.forEach.call(gameManager.gameBody.menuBoard.self.children,x=>x.classList.add('disappear'));
-                    switch(temp = e.target.id){
+                    switch(temp = temp.id){
                         case 'importGame':gameManager.gameFileSL.importFileSL();break;
                         case 'exportGame':{
                             if(confirm('即将下载json存档文件！是否继续？')){
@@ -533,11 +554,11 @@ window.onload = function(){
             }
             clickAudio.currentTime = 0,clickAudio.play();
         },true);
-        document.addEventListener('click',function(e){
+        document.addEventListener('click',e=>{
             // 一维click2move
-            let temp;
-            switch(temp = e.target.id){
-                case 'messageImage':e.target.classList.add('disappear');break;
+            var temp = e.target;
+            switch(temp.id){
+                case 'messageImage':temp.classList.add('disappear');break;
                 case 'messageVideo':;break;
                 case 'messageNext':gameManager.gameMessage.option.ended = true;break;
                 case 'messageAuto':{
@@ -607,11 +628,11 @@ window.onload = function(){
                     hoverAudio.volume = clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
                     break;
                 }
-                default:console.log(temp);
+                default:console.log(temp.id);
             }
             clickAudio.currentTime = 0,clickAudio.play();
         },true);
-        document.addEventListener('mouseenter',function(e){
+        document.addEventListener('mouseenter',e=>{
             // hoverAudio
             if(
                 ['loadSL','saveSL','deleteSL','saveConfig','resetConfig'].includes(e.target.id) ||
@@ -619,10 +640,10 @@ window.onload = function(){
             ){hoverAudio.currentTime = 0,hoverAudio.play();}
         },true);
 
-        document.addEventListener('keydown',function(e){
+        document.addEventListener('keydown',e=>{
             // key2move
             if(gameManager.gameBody.menu.className){
-                switch(e.key){
+                switch(e.key.toLowerCase()){
                     case 'a':gameManager.constTemp.moveDiraction.a = ['Left','-'];break;
                     case 's':gameManager.constTemp.moveDiraction.s = ['Top','+'];break;
                     case 'd':gameManager.constTemp.moveDiraction.d = ['Left','+'];break;
@@ -630,11 +651,11 @@ window.onload = function(){
                 }
             }
         },true);
-        document.addEventListener('keyup',function(e){
+        document.addEventListener('keyup',e=>{
             // stop&sth.
-            let temp;
-            delete gameManager.constTemp.moveDiraction[e.key];
-            switch(e.key){
+            var temp = e.key;
+            delete gameManager.constTemp.moveDiraction[temp.toLowerCase()];
+            switch(temp){
                 case 'c':gameManager.gamePlayer.photo.self.classList.toggle('disappear');break;
                 case 'q':gameManager.gameMessage.self.classList.toggle('disappear');break;
                 case 'Escape':gameManager.gameBody.menu.classList.toggle('disappear');break;

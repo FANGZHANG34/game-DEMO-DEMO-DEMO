@@ -2,7 +2,8 @@
     const oldWindowOnload = window.onload;
     window.onload = ()=>{
         oldWindowOnload();
-        window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards',easing: 'steps(4, start)'};
+        window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
+        window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
         const old_gameInfoSL_loader = window.gameManager.gameInfoSL.loader;
         window.gameManager.gameInfoSL.loader = function(){
             old_gameInfoSL_loader.call(this);
@@ -101,10 +102,10 @@
                     id: 1,object: undefined,x: 25,y: 25,
                     self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighter'})),
                     loader(id,x,y){
-                        const moveKeyframe = window.gameManager.constTemp.moveKeyframes[0];
+                        const UTmoveKeyframe = window.gameManager.constTemp.UTmoveKeyframes[0];
                         this.id === id || (this.display.style.backgroundImage = `url(${memoryHandle('characterArray.'+(this.id = id)+'.display')})`);
-                        moveKeyframe.marginLeft = (this.x = x)+'vw',moveKeyframe.marginTop = (this.y = y)+'vw';
-                        return this.self.animate(moveKeyframe,window.gameManager.constTemp.UTmoveConfig).finished;
+                        UTmoveKeyframe.translate = `${this.x = x}vw ${this.y = y}vw`;
+                        return this.self.animate(UTmoveKeyframe,window.gameManager.constTemp.UTmoveConfig).finished;
                     }
                 };
                 fighter.display = fighter.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighterDisplay'}));

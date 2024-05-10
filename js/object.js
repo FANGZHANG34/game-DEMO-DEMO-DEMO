@@ -32,14 +32,16 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
                 {text:
 `想要做什么事？`,audioUrl:'',videoUrl:'',imageUr:''},
                 {
-                    '听歌': objectArray.eventArray.get('1')[1],
-                    '看片': objectArray.eventArray.get('2')[1],
-                    '看动画': objectArray.eventArray.get('3')[1],
-                    'NOTHING!!!':()=>{
+                    听歌: objectArray.eventArray.get('1')[1],
+                    看片: objectArray.eventArray.get('2')[1],
+                    看动画: objectArray.eventArray.get('3')[1],
+                    战斗: objectArray.eventArray.get('4')[1],
+                    无:()=>{
                         window.gameManager.gameMessage.closer();
                         window.gameManager.playerMove.paused = false;
                         window.gameManager.gameMessage.option.finallyFn = undefined;
                         window.gameManager.gameMessage.option.ended = true;
+                        memoryHandle('mapDataArray.001.4','w',undefined);
                     }
                 },
                 objectArray.eventArray.get('0')[1]

@@ -7,10 +7,10 @@ window.onload = function(){
     // .setGameInterval() 设置游戏循环计时器的ID
     const gameManager = window.gameManager = {
         constTemp: {
-            memory: undefined,
-            moveDiraction: {},moveKeyframes: [{marginLeft: undefined,marginTop: undefined}],
-            gameBodyKeyframes: [{marginLeft: undefined,marginTop: undefined}],
-            moveConfig: {duration: 66,fill: 'forwards',easing: 'steps(4, start)'}
+            memory: undefined,gameTip: false,moveDiraction: {},
+            moveKeyframes: [{translate: undefined}],
+            gameBodyKeyframes: [{translate: undefined}],
+            moveConfig: {duration: 66,fill: 'forwards'}
         },
         setGameInterval(type,timeSep){
             let temp;
@@ -204,7 +204,7 @@ window.onload = function(){
                 if(xyz){
                     for(let i = 0;i < 3;i++){this.xyz[i] = xyz[i];}
                     if(!this.self.style.zIndex || +this.self.style.zIndex !== xyz[2]){this.self.style.zIndex = String(xyz[2]);}
-                    moveKeyframe.marginLeft = xyz[0] * singleStepLength+'px',moveKeyframe.marginTop = xyz[1] * singleStepLength+'px';
+                    moveKeyframe.translate = `${xyz[0] * singleStepLength}px ${xyz[1] * singleStepLength}px`;
                 }
                 isFocus && this.focus();
                 if(this === gamePlayer){
@@ -218,14 +218,13 @@ window.onload = function(){
                 const windowWidth = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
                 const windowHeight = windowWidth * 9/16;
                 const gameBodyKeyframes = gameManager.constTemp.gameBodyKeyframes[0];
-                gameBodyKeyframes.marginLeft = -Math.min(
+                gameBodyKeyframes.translate = `${-Math.min(
                     Math.max(0,singleStepLength * this.xyz[0] - (windowWidth - singleStepLength) / 2),
                     mapPositionWidth - windowWidth
-                )+'px',
-                gameBodyKeyframes.marginTop = -Math.min(
+                )}px ${-Math.min(
                     Math.max(0,singleStepLength * this.xyz[1] - (windowHeight - singleStepLength) / 2),
                     mapPositionHeight - windowHeight
-                )+'px';
+                )}px`;
                 gameManager.gameBody.self.animate(gameBodyKeyframes,gameManager.constTemp.moveConfig);
             }
         };
@@ -483,9 +482,8 @@ window.onload = function(){
         document.addEventListener('mousemove',e=>{
             // mouse2tip
             const gameTip = gameManager.gameBody.gameTip,tipStyle = gameTip.style,tipFn = ()=>{
-                tipStyle.marginLeft = e.clientX + 32+'px',
-                tipStyle.marginTop = e.clientY + 18+'px';
-                gameTip.classList.remove('disappear');
+                tipStyle.transform = `translate(${e.clientX + 32}px,${e.clientY + 18}px)`;
+                gameManager.constTemp.gameTip ||= (gameTip.classList.remove('disappear'),true);
             };
             var temp = e.target;
             switch(temp.parentElement?.id){
@@ -496,7 +494,7 @@ window.onload = function(){
                 case 'fighterThis':{
                     tipFn();break;
                 }
-                default:gameTip.classList.add('disappear');
+                default:gameManager.constTemp.gameTip &&= (gameTip.classList.add('disappear'),false);
             }
         },true);
         document.addEventListener('click',e=>{
@@ -556,7 +554,7 @@ window.onload = function(){
             // 一维click2move
             var temp = e.target;
             switch(temp.id){
-                case 'messageImage':temp.classList.add('disappear');break;
+                case 'messageImage':;break;
                 case 'messageVideo':;break;
                 case 'messageNext':gameManager.gameMessage.option.ended = true;break;
                 case 'messageAuto':{
