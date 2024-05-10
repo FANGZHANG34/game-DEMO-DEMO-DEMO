@@ -497,6 +497,12 @@ window.onload = function(){
                 default:gameManager.constTemp.gameTip &&= (gameTip.classList.add('disappear'),false);
             }
         },true);
+        document.addEventListener('scroll',e=>{
+            // scroll2view
+            var limit = (window.innerWidth ?? document.documentElement.clientWidth ?? document.body.clientWidth) * .5625 -
+            (window.innerHeight ?? document.documentElement.clientHeight ?? document.body.clientHeight);
+            limit < document.documentElement.scrollTop && window.scrollTo(0,limit);
+        },true);
         document.addEventListener('click',e=>{
             // 三维click2move
             var temp = e.target;
