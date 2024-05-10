@@ -482,7 +482,7 @@ window.onload = function(){
         document.addEventListener('mousemove',e=>{
             // mouse2tip
             const gameTip = gameManager.gameBody.gameTip,tipStyle = gameTip.style,tipFn = ()=>{
-                tipStyle.transform = `translate(${e.clientX + 32}px,${e.clientY + 18}px)`;
+                tipStyle.translate = `${e.clientX + 32}px ${e.clientY + 18}px`;
                 gameManager.constTemp.gameTip ||= (gameTip.classList.remove('disappear'),true);
             };
             var temp = e.target;
