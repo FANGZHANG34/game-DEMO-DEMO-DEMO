@@ -11,7 +11,9 @@
 }body{
     width: 100vw;
     height: calc((var(--mapWidth) - 100vw) * 9 / 16 + 100vh);
-    overflow: hidden;
+    overflow: hidden scroll;
+}body>*{
+    position: absolute;
 }hr{
     border: 1px solid white;
 }.disappear{
@@ -22,7 +24,6 @@
 }
 /*开始界面*/
 #startGame{
-    position: fixed;
     width: 100vw;
     height:  56.25vw;
     text-align: center;
@@ -35,7 +36,7 @@
 }
 /*游戏提示*/
 #gameTip{
-    position: fixed;
+    position: fixed !important;
     width: 20vw;
     border: .5vw solid #ccc;
     background-color: black;
@@ -43,7 +44,7 @@
 }
 /*挡板*/
 #gameBorder{
-    position: fixed;
+    position: absolute;
     background-color: black;
     margin-top: 56.25vw;
     width: 100vw;
@@ -51,7 +52,7 @@
     z-index: 6;
 }
 /*游戏主体*/
-#gameBody,canvas.mapImg{
+canvas.mapImg{
     position: absolute;
 }#player,.mapObject{
     position: absolute;
@@ -76,7 +77,6 @@
 }
 /*立绘*/
 #playerPhoto{
-    position: fixed;
     margin-left: 80vw;
     width: 20vw;
     height: 56.25vw;
@@ -84,7 +84,6 @@
 }
 /*媒体*/
 #messageVideo,#messageImage,video{
-    position: fixed;
     z-index: 8;
     width: 100vw;
     height: 56.25vw;
@@ -92,7 +91,6 @@
 /*消息*/
 #gameMessage{
     color: white;
-    position: fixed;
     z-index: 8;
     margin-top: calc(425vw / 12);
     width: 100vw;
@@ -144,7 +142,6 @@
     background-image: url(../img/bg.png);
     background-size: 100vw;
     background-repeat: no-repeat;
-    position: fixed;
     width: 100vw;
     height: 56.25vw;
     color: #fff;

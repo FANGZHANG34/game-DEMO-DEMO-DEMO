@@ -1,6 +1,6 @@
 /* UT（undertale）主体 */
 #undertaleBody{
-    position: fixed;
+    position: absolute;
     font-size: 2.5vw;
     color: white;
     width: 100vw;
