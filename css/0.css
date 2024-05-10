@@ -132,11 +132,11 @@
 }#messageOption>div>div{
     width: 33vw;
     height: 4vw;
-    font-size: 3vw;
+    font-size: 2.5vw;
     text-align: center;
     align-content: center;
 }#messageOption>div>div:hover{
-    font-size: 4vw;
+    scale: 1.2;
     background-color: rgba(0, 0, 0, 0.6);
 }
 /*菜单*/
@@ -162,7 +162,7 @@
     height: 7.5vw;
     align-content: center;
 }#option>div:hover{
-    font-size: 7.5vw;
+    scale: 1.5;
     background-color: rgba(225, 225, 225, 0.5);
 }#menuBoard{
     width: 60vw;
@@ -266,10 +266,10 @@
     height: 5vw;
     align-content: center;
 }#SL>div:hover{
-    font-size: 5vw;
+    scale: 1.5;
     background-color: rgba(225, 225, 225, 0.2);
 }#SL>div.focus{
-    font-size: 4vw;
+    scale: 1.5;
     background-color: rgba(150, 225, 150, 0.6);
 }#infoSL{
     margin-left: 30vw;
