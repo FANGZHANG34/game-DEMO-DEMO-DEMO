@@ -29,29 +29,40 @@ function copyObj(obj = {}){
     return newobj;
 }
 // messageImageConat 图片整合显示
-function messageImageConat(imgUrlArray){
+function messageImageConat(imgUrl0,...imgUrlArray){
     const cartoonManager = window.gameManager.gameMessage.content;
-    let temp;
-    if(temp = imgUrlArray.shift()){
-        cartoonManager.loader('','',temp);
-        cartoonManager.image.autoReset = false;
-        for(temp of imgUrlArray){cartoonManager.loader('','',temp);}
-        new Promise(()=>{cartoonManager.image.autoReset = true;});
+    var i,imagePromiseArray = [];
+    for(i of imgUrlArray){
+        imagePromiseArray.push(new Promise((resolve)=>{
+            (imagePromiseArray[i] = new Image()).src = i;
+            imagePromiseArray[i].onload = imagePromiseArray[i].onerror = ()=>resolve(1);
+        }))
     }
+    Promise.all(imagePromiseArray).then(()=>{
+        (i = new Image()).src = imgUrl0;
+        i.onload = ()=>{
+            imgUrl0 && cartoonManager.loader('','',imgUrl0);
+            cartoonManager.image.autoReset = false;
+            for(i of imgUrlArray){cartoonManager.loader('','',i);}
+            cartoonManager.image.autoReset = true;
+            i = imagePromiseArray = null;
+        }
+    });
 }
 // loadCartoon 动画显示
 function loadCartoon(params = {head: 'w99_',tail: '.png',minN: 1,maxN: 79,longN: 2,bgmUrl: './audio/FM18.ogg'}){
-    let tempPaused = window.gameManager.playerMove.paused;
+    var tempPaused = window.gameManager.playerMove.paused;
     window.gameManager.playerMove.paused = true;
     const cartoonManager = window.gameManager.gameMessage.content;
     cartoonManager.loader('',params.bgmUrl);
-    [cartoonManager.image.stage.width,cartoonManager.image.stage.height] = [1280,720];
-    let N = params.minN;
+    [cartoonManager.image.self.width,cartoonManager.image.self.height] = [1280,720];
+    var N = params.minN;
     const tempFn = ()=>{
-        cartoonManager.loader('','','./img/'+params.head+strN(N++,params.longN)+params.tail);
+        // cartoonManager.loader('','','./img/'+params.head+strN(N++,params.longN)+params.tail);
+        messageImageConat('./img/w99_80.png','./img/'+params.head+strN(N++,params.longN)+params.tail);
         return N > params.maxN ? ()=>{
             tempPaused ? window.gameManager.gameMessage.self.classList.remove('disappear') : window.gameManager.playerMove.paused = false;
-            [cartoonManager.image.stage.width,cartoonManager.image.stage.height] = [1920,1080];
+            [cartoonManager.image.self.width,cartoonManager.image.self.height] = [1920,1080];
         } : tempFn;
     }
     window.gameManager.tempProcess.nowFn = tempFn;

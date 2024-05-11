@@ -80,8 +80,17 @@ window.onload = function(){
         // .menuBoard 选项对应面板对象
         const gameBody = gameManager.gameBody = {
             self: document.getElementById('gameBody'),
-            gameTip: document.getElementById('gameTip'),
             menu: document.getElementById('menu'),
+            gameTip: {
+                self: temp = document.getElementById('gameTip'),
+                tipFn(mouseEvent,isTip = true){
+                    const gameTip = this.self,tipStyle = this.style;
+                    isTip ? (
+                        tipStyle.translate = `${mouseEvent.clientX + 32}px ${mouseEvent.clientY + 18}px`,
+                        gameManager.constTemp.gameTip ||= (gameTip.classList.remove('disappear'),true)
+                    ) : gameManager.constTemp.gameTip &&= (gameTip.classList.add('disappear'),false);
+                }
+            },
             menuBoard: {
                 self: document.getElementById('menuBoard'),
                 title: {self: document.getElementById('guide')},
@@ -90,6 +99,7 @@ window.onload = function(){
                 config: {self: document.getElementById('myConfig')}
             }
         };
+        gameBody.gameTip.style = temp.style;
         (temp = Array.from(gameBody.menuBoard.config.self.children)).shift();
         for(let element of temp){
             gameBody.menuBoard.config[element.id] = element.children[1];
@@ -240,11 +250,11 @@ window.onload = function(){
                 temp: new Image()
             };
             gamePlayerPhoto.self.height = 2025;
-            gamePlayerPhoto.content = gamePlayerPhoto.self.getContext('2d');
+            gamePlayerPhoto.context = gamePlayerPhoto.self.getContext('2d');
             // gamePlayerPhoto.temp.src = './img/actor0.jpg';
             gamePlayerPhoto.temp.onload = ()=>{
                 gamePlayerPhoto.self.width = 720;
-                gamePlayerPhoto.content.drawImage(gamePlayerPhoto.temp,0,0);
+                gamePlayerPhoto.context.drawImage(gamePlayerPhoto.temp,0,0);
             }
         }
     }
@@ -398,25 +408,19 @@ window.onload = function(){
             content.self = document.getElementById('messageContent');
             content.text = document.getElementById('messageText');
             {
-                content.image = {autoReset: true};
-                content.image.self = new Image();
-                content.image.stage = document.getElementById('messageImage');
-                [content.image.stage.width,content.image.stage.height] = [1920,1080];
-                content.image.self.onload= function(){
-                    // console.log(content.image.autoReset);
-                    content.image.autoReset && (content.image.stage.width = content.image.stage.width);
-                    content.image.stage.getContext('2d').drawImage(this,0,0);
-                    content.image.stage.classList.remove('disappear');
-                };
+                content.image = {self: document.getElementById('messageImage'),autoReset: true};
+                [content.image.self.width,content.image.self.height] = [1920,1080];
             }
             content.video = document.getElementById('messageVideo');
             content.audio = new Audio();
             content.video.addEventListener('ended',function(){this.classList.add('disappear');});
             content.reset = function(){
-                this.image.stage.classList.add('disappear');
+                const temp0 = this.image.self,temp1 = temp0.getContext('2d');
+                temp0.classList.add('disappear');
                 this.video.classList.add('disappear');
+                temp1.clearRect(0, 0, temp0.width, temp0.height);
+                temp1.closePath();
                 this.text.textContent = '';
-                this.image.stage.width = this.image.stage.width;
                 clearMedia(this.video);
                 clearMedia(this.audio);
             }
@@ -431,7 +435,16 @@ window.onload = function(){
                         this.self.scrollTo({top:this.self.scrollHeight,behavior:'smooth'});
                     }, configArray.globalArray.textSep);
                 }
-                if(imageUrl){this.image.self.src = imageUrl}
+                if(imageUrl){
+                    const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d')
+                    const temp = new Image();
+                    temp.onload = ()=>{
+                        autoReset && (temp1.clearRect(0, 0, temp0.width, temp0.height),temp1.closePath());
+                        temp1.drawImage(temp,0,0);
+                        temp0.classList.remove('disappear');
+                    };
+                    temp.src = imageUrl;
+                }
                 if(videoUrl){
                     this.video.src = videoUrl;
                     this.video.play();
@@ -479,34 +492,17 @@ window.onload = function(){
     
     {
         // 交互设置
-        document.addEventListener('mousemove',e=>{
-            // mouse2tip
-            const gameTip = gameManager.gameBody.gameTip,tipStyle = gameTip.style,tipFn = ()=>{
-                tipStyle.translate = `${e.clientX + 32}px ${e.clientY + 18}px`;
-                gameManager.constTemp.gameTip ||= (gameTip.classList.remove('disappear'),true);
-            };
-            var temp = e.target;
-            switch(temp.parentElement?.id){
-                case 'fighterBuff':;
-                case 'fighterDebuff':{
-                    tipFn();break;
-                }
-                case 'fighterThis':{
-                    tipFn();break;
-                }
-                default:gameManager.constTemp.gameTip &&= (gameTip.classList.add('disappear'),false);
-            }
-        },true);
+        document.onmousemove = e=>{const gameTip = window.gameManager.gameBody.gameTip;gameTip.tipFn(e,false);};
         document.addEventListener('scroll',e=>{
             // scroll2view
-            var limit = (window.innerWidth ?? document.documentElement.clientWidth ?? document.body.clientWidth) * .5625 -
+            const limit = (window.innerWidth ?? document.documentElement.clientWidth ?? document.body.clientWidth) * .5625 -
             (window.innerHeight ?? document.documentElement.clientHeight ?? document.body.clientHeight);
             limit < document.documentElement.scrollTop && window.scrollTo(0,limit);
         },true);
         document.addEventListener('click',e=>{
             // 三维click2move
             var temp = e.target;
-            switch(temp.parentElement.parentElement.id){
+            switch(temp.parentElement.parentElement?.id){
                 case 'gameMapBoard':{
                     const previous = [
                         (temp = gameManager.gameMap.board.array.indexOf(temp)) % mapWidth,

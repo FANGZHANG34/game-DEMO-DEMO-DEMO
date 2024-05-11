@@ -9,11 +9,20 @@
             old_gameInfoSL_loader.call(this);
             undertaleManager.body.self.classList.add('disappear');
             undertaleManager.undertaleProcess.paused = true;
+            const temp = window.gameManager.constTemp.memory.characterArray;
+            objectArray.characterArray.forEach((value,key)=>{
+                value.strength = new Strength(temp[key]?.strength ?? arrayUT.characterArrayUT.get(key));
+            });
         }
         const undertaleManager = window.gameManager.undertaleManager = {
             body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: undefined,enemyID: undefined,
+            tempFn: ()=>void undertaleManager.closer(),
             undertaleProcess: window.gameManager.undertaleProcess = {
-                intervalID: undefined,timeSep: undefined,paused: true,onEvent: undefined,nowFn: undefined,
+                intervalID: undefined,timeSep: undefined,paused: true,
+                onEvent: ()=>{
+                    undertaleManager.fighter.x % 50 || undertaleManager.fighter.y % 50 || undertaleManager.closer();
+                },
+                nowFn: undefined,
                 defaultFn: ()=>{
                     let temp;
                     if(undertaleManager.fighter.id !== undefined){
@@ -24,7 +33,6 @@
                                 case 'Top': previous[1] = Math.min(Math.max(0,undertaleManager.fighter.y + +(temp[1]+'1')),50);break;
                             }
                             undertaleManager.fighter.loader(undertaleManager.fighter.id,...previous);
-                            undertaleManager.fighter.x % 50 || undertaleManager.fighter.y % 50 || undertaleManager.closer();
                         }
                     }
                 }
@@ -41,12 +49,11 @@
                 this.body.self.classList.remove('disappear');
                 setTimeout(()=>{this.undertaleProcess.paused = false;},500);
             },
-            closer(fn){
+            closer(fn = ()=>{setTimeout(()=>{window.gameManager.playerMove.paused = false;},500);}){
                 this.undertaleProcess.paused = true;
                 undertaleManager.closeTempMemory();
                 this.body.self.classList.add('disappear');
-                setTimeout(()=>{window.gameManager.playerMove.paused = false;},500);
-                fn?.();
+                return fn?.();
             }
         };
         {
@@ -55,10 +62,10 @@
                 id: undefined,array: undefined,self: makeElement('div',{id: 'fighterConditionStage'}),
                 loader(){
                     if(this.array){return;}else{
-                        var temp = [];
+                        var temp = [],id;
                         this.array = [window.gameManager.gamePlayer.id,undertaleManager.enemyID,...window.gameManager.gameFileSL.origin[0].partner];
                         this.fighterThis.innerHTML = '';
-                        for(let id of this.array){
+                        for(id of this.array){
                             temp.push('<div>',memoryHandle('characterArray.'+id+'.name'),'</div>');
                         }
                         this.fighterThis.innerHTML = temp.join('');
@@ -128,13 +135,35 @@
         window.gameManager.setGameInterval('undertaleProcess',33);
 
         {
+            document.onmousemove = e=>{
+                // mouse2tip
+                var temp = e.target;
+                const gameTip = window.gameManager.gameBody.gameTip;
+                switch(temp.parentElement?.id){
+                    case 'fighterBuff':;
+                    case 'fighterDebuff':gameTip.tipFn(e);break;
+                    case 'fighterThis':gameTip.tipFn(e);break;
+                    default:gameTip.tipFn(e,false);
+                }
+            };
             document.addEventListener('click',e=>{
+                // click2change
                 var temp = e.target;
                 switch(temp.parentElement.id){
                     case 'fighterThis':{
-                        for(let i of temp.parentElement.children){i.id = '';}
+                        var i,buff;
+                        const strength = objectArray.characterArray.get(objectArray.characterArray.list.indexOf(temp.textContent)).strength;
+                        for(i of temp.parentElement.children){i.id = '';}
                         temp.id = 'thisFighter';
-                        memoryHandle('characterArray.'+objectArray.characterArray.list.indexOf(temp.textContent)+'.strength');
+                        i = 0;
+                        while(temp = temp.previousElementSibling){i++;}
+                        console.log(i);
+                        temp = [];
+                        for(buff of strength.buffArray){temp.push('<div>'+buff+'</div>');}
+                        undertaleManager.fighterCondition.fighterBuff.innerHTML = temp.join('');
+                        temp = [];
+                        for(buff of strength.debuffArray){temp.push('<div>'+buff+'</div>');}
+                        undertaleManager.fighterCondition.fighterDebuff.innerHTML = temp.join('');
                         break;
                     }
                 }
