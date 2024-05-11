@@ -19,7 +19,7 @@
 #thisFighter{
     background-color: #c6c;
 }
-#fighterConditionStage>div{
+#fighterConditionStage div{
     height: 2.5vw;
 }#fighterHP,#fighterMP,#fighterCharge{
     margin-left: 10vw;
@@ -42,12 +42,22 @@
     text-align: center;
     vertical-align: top;
     width: 10vw;
-    height: 2.5vw;
 }.fighterInfoName{
     position: absolute;
     margin-left: -10vw;
 }#fighterBuff,#fighterDebuff{
-    overflow: scroll;
+    white-space: nowrap;
+    overflow: scroll hidden;
+}#fighterBuff>div,#fighterDebuff>div{
+    display: inline-block;
+    text-align: center;
+    width: 10vw;
+}#fighterBuff>div{
+    background-color: #060;
+    border-left: .625vw solid #0c0;
+}#fighterDebuff>div{
+    background-color: #600;
+    border-left: .625vw solid #c00;
 }#fighterPhoto{
     width: 20vw;
     height: 41.25vw;
