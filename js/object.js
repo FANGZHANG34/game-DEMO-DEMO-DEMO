@@ -83,7 +83,7 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
     ]).set('3',[
         '看动画',()=>{
             window.gameManager.gameMessage.self.classList.add('disappear');
-            loadCartoon();
+            loadCartoon({timeSep: 100,mode: 2});
         }
     ]).set('4',[
         '战斗',()=>{

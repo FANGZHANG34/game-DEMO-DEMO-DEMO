@@ -31,36 +31,61 @@ function copyObj(obj = {}){
 // messageImageConat 图片整合显示
 function messageImageConat(imgUrl0,...imgUrlArray){
     const cartoonManager = window.gameManager.gameMessage.content;
-    var i,imagePromiseArray = [];
+    var i,imagePromiseArray = [],tempArray = {};
     for(i of imgUrlArray){
-        imagePromiseArray.push(new Promise((resolve)=>{
-            (imagePromiseArray[i] = new Image()).src = i;
-            imagePromiseArray[i].onload = imagePromiseArray[i].onerror = ()=>resolve(1);
+        imagePromiseArray.push(new Promise(resolve=>{
+            (tempArray[i] = new Image()).src = i;
+            tempArray[i].onload = ()=>resolve(true);
+            tempArray[i].onerror = ()=>resolve(false);
         }))
     }
-    Promise.all(imagePromiseArray).then(()=>{
-        (i = new Image()).src = imgUrl0;
-        i.onload = ()=>{
-            imgUrl0 && cartoonManager.loader('','',imgUrl0);
-            cartoonManager.image.autoReset = false;
-            for(i of imgUrlArray){cartoonManager.loader('','',i);}
-            cartoonManager.image.autoReset = true;
-            i = imagePromiseArray = null;
+    Promise.all(imagePromiseArray).then(value=>{
+        for(i of value){
+            if(i){
+                new Promise(resolve=>{
+                    var temp = (i = new Image()).src = imgUrl0 ?? '';
+                    i.onload = ()=>resolve(temp);
+                    i.onerror = ()=>resolve(false);
+                }).then(value=>{
+                    value && cartoonManager.loader('','',imgUrl0);
+                    cartoonManager.image.autoReset = false;
+                    for(i of imgUrlArray){cartoonManager.loader('','',i);}
+                    cartoonManager.image.autoReset = true;
+                    i = imagePromiseArray = tempArray = null;
+                });
+                break;
+            }
         }
     });
 }
 // loadCartoon 动画显示
-function loadCartoon(params = {head: 'w99_',tail: '.png',minN: 1,maxN: 79,longN: 2,bgmUrl: './audio/FM18.ogg'}){
-    var tempPaused = window.gameManager.playerMove.paused;
+function loadCartoon({
+    head = 'w99_',tail = '.png',minN = 1,maxN = 79,longN = 2,bgmUrl = './audio/FM18.ogg',bgImgUrl = './img/w99_80.png',
+    timeSep = 100,mode = 0
+} = {}){
+    var tempPaused = window.gameManager.playerMove.paused,playFn;
+    window.gameManager.setGameInterval('tempProcess',timeSep / (mode < 1 ? 1 : 2));
     window.gameManager.playerMove.paused = true;
+    head = './img/'+head;
     const cartoonManager = window.gameManager.gameMessage.content;
-    cartoonManager.loader('',params.bgmUrl);
+    cartoonManager.loader('',bgmUrl);
     [cartoonManager.image.self.width,cartoonManager.image.self.height] = [1280,720];
-    var N = params.minN;
+    var N = minN;
+    switch(mode){
+        case 0:
+            playFn = bgImgUrl ? ()=>{messageImageConat(bgImgUrl,head+strN(N++,longN)+tail);} :
+            ()=>{cartoonManager.loader('','',head+strN(N++,longN)+tail);};break;
+        case 1:playFn = ()=>{messageImageConat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail);};break;
+        case 2:
+            var tempN,tempPlayFn = bgImgUrl
+            ? ()=>{messageImageConat(bgImgUrl,head+strN((tempN = N),longN)+tail)}
+            : ()=>{cartoonManager.loader('','',head+strN((tempN = N),longN)+tail);};
+            playFn = ()=>{tempN === N ? messageImageConat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail) : tempPlayFn();}
+            break;
+        default:throw(new Error(`=> There is no mode '${mode}'`));
+    }
     const tempFn = ()=>{
-        // cartoonManager.loader('','','./img/'+params.head+strN(N++,params.longN)+params.tail);
-        messageImageConat('./img/w99_80.png','./img/'+params.head+strN(N++,params.longN)+params.tail);
-        return N > params.maxN ? ()=>{
+        playFn();return N > maxN ? ()=>{
             tempPaused ? window.gameManager.gameMessage.self.classList.remove('disappear') : window.gameManager.playerMove.paused = false;
             [cartoonManager.image.self.width,cartoonManager.image.self.height] = [1920,1080];
         } : tempFn;

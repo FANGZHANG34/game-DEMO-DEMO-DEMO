@@ -8,6 +8,7 @@ window.onload = function(){
     const gameManager = window.gameManager = {
         constTemp: {
             memory: undefined,gameTip: false,moveDiraction: {},
+            tempImageArray: new Map(),
             moveKeyframes: [{translate: undefined}],
             gameBodyKeyframes: [{translate: undefined}],
             moveConfig: {duration: 66,fill: 'forwards'}
@@ -492,7 +493,7 @@ window.onload = function(){
     
     {
         // 交互设置
-        document.onmousemove = e=>{const gameTip = window.gameManager.gameBody.gameTip;gameTip.tipFn(e,false);};
+        // document.onmousemove = e=>{const gameTip = window.gameManager.gameBody.gameTip;gameTip.tipFn(e,false);};
         document.addEventListener('scroll',e=>{
             // scroll2view
             const limit = (window.innerWidth ?? document.documentElement.clientWidth ?? document.body.clientWidth) * .5625 -
