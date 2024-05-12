@@ -44,7 +44,6 @@ function messageImageConat(imgUrl0,...imgUrlArray){
         var i = value.reduce((a,b)=>a + b,0);
         if(i){
             const globalAlpha = (7 / 8) ** (i - 1);
-            console.log(globalAlpha);
             new Promise(resolve=>{
                 tempImageArray.has(imgUrl0) && resolve(imgUrl0);
                 var temp = (i = new Image()).src = imgUrl0 ?? '';
@@ -53,7 +52,7 @@ function messageImageConat(imgUrl0,...imgUrlArray){
             }).then(value=>{
                 value && cartoonManager.loader('','',imgUrl0);
                 cartoonManager.image.autoReset = false;
-                ctx.globalAlpha = globalAlpha;
+                globalAlpha === 1 || (ctx.globalAlpha = globalAlpha);
                 for(i of imgUrlArray){cartoonManager.loader('','',i);}
                 cartoonManager.image.autoReset = true;
                 ctx.globalAlpha = 1;
