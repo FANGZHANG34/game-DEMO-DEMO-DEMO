@@ -30,32 +30,34 @@ function copyObj(obj = {}){
 }
 // messageImageConat 图片整合显示
 function messageImageConat(imgUrl0,...imgUrlArray){
-    const cartoonManager = window.gameManager.gameMessage.content,tempImageArray = window.gameManager.constTemp.tempImageArray;
-    const imagePromiseArray = [],tempArray = {};
+    const cartoonManager = window.gameManager.gameMessage.content,ctx = cartoonManager.image.self.getContext('2d');
+    const tempImageArray = window.gameManager.constTemp.tempImageArray,imagePromiseArray = [],tempArray = {};
     for(let i of imgUrlArray){
         imagePromiseArray.push(new Promise(resolve=>{
-            tempImageArray.has(i) && resolve(true);
+            tempImageArray.has(i) && resolve(1);
             (tempArray[i] = new Image()).src = i;
-            tempArray[i].onload = ()=>{tempImageArray.set(i,tempArray[i]);resolve(true);};
-            tempArray[i].onerror = ()=>resolve(false);
+            tempArray[i].onload = ()=>{tempImageArray.set(i,tempArray[i]);resolve(1);};
+            tempArray[i].onerror = ()=>resolve(0);
         }))
     }
     Promise.all(imagePromiseArray).then(value=>{
-        for(let i of value){
-            if(i){
-                new Promise(resolve=>{
-                    tempImageArray.has(imgUrl0) && resolve(imgUrl0);
-                    var temp = (i = new Image()).src = imgUrl0 ?? '';
-                    i.onload = ()=>resolve(temp);
-                    i.onerror = ()=>resolve(false);
-                }).then(value=>{
-                    value && cartoonManager.loader('','',imgUrl0);
-                    cartoonManager.image.autoReset = false;
-                    for(i of imgUrlArray){cartoonManager.loader('','',i);}
-                    cartoonManager.image.autoReset = true;
-                });
-                break;
-            }
+        var i = value.reduce((a,b)=>a + b,0);
+        if(i){
+            const globalAlpha = (7 / 8) ** (i - 1);
+            console.log(globalAlpha);
+            new Promise(resolve=>{
+                tempImageArray.has(imgUrl0) && resolve(imgUrl0);
+                var temp = (i = new Image()).src = imgUrl0 ?? '';
+                i.onload = ()=>resolve(temp);
+                i.onerror = ()=>resolve(false);
+            }).then(value=>{
+                value && cartoonManager.loader('','',imgUrl0);
+                cartoonManager.image.autoReset = false;
+                ctx.globalAlpha = globalAlpha;
+                for(i of imgUrlArray){cartoonManager.loader('','',i);}
+                cartoonManager.image.autoReset = true;
+                ctx.globalAlpha = 1;
+            });
         }
     });
 }
@@ -65,7 +67,7 @@ function loadCartoon({
     timeSep = 100,mode = 0
 } = {}){
     var tempPaused = window.gameManager.playerMove.paused,playFn;
-    window.gameManager.setGameInterval('tempProcess',timeSep / (mode > 1 ? 2 : 1));
+    window.gameManager.setGameInterval('tempProcess',timeSep / (mode || 1));
     window.gameManager.playerMove.paused = true;
     head = './img/'+head;
     const cartoonManager = window.gameManager.gameMessage.content;
