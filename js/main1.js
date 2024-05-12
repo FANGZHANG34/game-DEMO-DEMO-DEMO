@@ -437,14 +437,21 @@ window.onload = function(){
                     }, configArray.globalArray.textSep);
                 }
                 if(imageUrl){
-                    const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d')
-                    const temp = new Image();
-                    temp.onload = ()=>{
+                    let imageIf = gameManager.constTemp.tempImageArray.get(imageUrl);
+                    const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d');
+                    if(imageIf){
                         autoReset && (temp1.clearRect(0, 0, temp0.width, temp0.height),temp1.closePath());
-                        temp1.drawImage(temp,0,0);
-                        temp0.classList.remove('disappear');
-                    };
-                    temp.src = imageUrl;
+                        temp1.drawImage(imageIf,0,0);
+                    }else{
+                        const temp = new Image();
+                        temp.onload = ()=>{
+                            autoReset && (temp1.clearRect(0, 0, temp0.width, temp0.height),temp1.closePath());
+                            temp1.drawImage(temp,0,0);
+                            gameManager.constTemp.tempImageArray.set(imageUrl,temp);
+                            temp0.classList.remove('disappear');
+                        };
+                        temp.src = imageUrl;
+                    }
                 }
                 if(videoUrl){
                     this.video.src = videoUrl;

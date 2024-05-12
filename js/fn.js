@@ -30,19 +30,21 @@ function copyObj(obj = {}){
 }
 // messageImageConat 图片整合显示
 function messageImageConat(imgUrl0,...imgUrlArray){
-    const cartoonManager = window.gameManager.gameMessage.content;
-    var i,imagePromiseArray = [],tempArray = {};
-    for(i of imgUrlArray){
+    const cartoonManager = window.gameManager.gameMessage.content,tempImageArray = window.gameManager.constTemp.tempImageArray;
+    const imagePromiseArray = [],tempArray = {};
+    for(let i of imgUrlArray){
         imagePromiseArray.push(new Promise(resolve=>{
+            tempImageArray.has(i) && resolve(true);
             (tempArray[i] = new Image()).src = i;
-            tempArray[i].onload = ()=>resolve(true);
+            tempArray[i].onload = ()=>{tempImageArray.set(i,tempArray[i]);resolve(true);};
             tempArray[i].onerror = ()=>resolve(false);
         }))
     }
     Promise.all(imagePromiseArray).then(value=>{
-        for(i of value){
+        for(let i of value){
             if(i){
                 new Promise(resolve=>{
+                    tempImageArray.has(imgUrl0) && resolve(imgUrl0);
                     var temp = (i = new Image()).src = imgUrl0 ?? '';
                     i.onload = ()=>resolve(temp);
                     i.onerror = ()=>resolve(false);
@@ -51,7 +53,6 @@ function messageImageConat(imgUrl0,...imgUrlArray){
                     cartoonManager.image.autoReset = false;
                     for(i of imgUrlArray){cartoonManager.loader('','',i);}
                     cartoonManager.image.autoReset = true;
-                    i = imagePromiseArray = tempArray = null;
                 });
                 break;
             }
@@ -60,11 +61,11 @@ function messageImageConat(imgUrl0,...imgUrlArray){
 }
 // loadCartoon 动画显示
 function loadCartoon({
-    head = 'w99_',tail = '.png',minN = 1,maxN = 79,longN = 2,bgmUrl = './audio/FM18.ogg',bgImgUrl = './img/w99_80.png',
+    head = 'w99_',tail = '.png',minN = 1,maxN = 79,longN = 2,bgmUrl = './audio/FM18.ogg',bgImgUrl = './img/w99_00.png',
     timeSep = 100,mode = 0
 } = {}){
     var tempPaused = window.gameManager.playerMove.paused,playFn;
-    window.gameManager.setGameInterval('tempProcess',timeSep / (mode < 1 ? 1 : 2));
+    window.gameManager.setGameInterval('tempProcess',timeSep / (mode > 1 ? 2 : 1));
     window.gameManager.playerMove.paused = true;
     head = './img/'+head;
     const cartoonManager = window.gameManager.gameMessage.content;
