@@ -19,6 +19,9 @@ function clearMedia(mediaElement){
     mediaElement.removeAttribute('src');
     mediaElement.load();
 }
+// getWindowWidth / getWindowHeight 获取窗口宽/高
+function getWindowWidth(){return (window.innerWidth ?? document.documentElement.clientWidth ?? document.body.clientWidth);}
+function getWindowHeight(){return (window.innerHeight ?? document.documentElement.clientHeight ?? document.body.clientHeight);}
 // copyObj 深复制对象
 function copyObj(obj = {}){
     var newobj;
@@ -28,10 +31,19 @@ function copyObj(obj = {}){
     }else{newobj = obj;}
     return newobj;
 }
-// messageImageConat 图片整合显示
-function messageImageConat(imgUrl0,...imgUrlArray){
-    const cartoonManager = window.gameManager.gameMessage.content,ctx = cartoonManager.image.self.getContext('2d');
-    const tempImageArray = window.gameManager.constTemp.tempImageArray,imagePromiseArray = [],tempArray = {};
+// makeElement 定制元素
+function makeElement(tagName, config){
+    // e.g.
+    // makeElement('div', {'className':'normal','textContent':'helloworld'});
+    const theElement = document.createElement(tagName);
+    for(let i in config){theElement[i]=config[i];}
+    return theElement;
+}
+// messageImageConcat 图片整合显示
+function messageImageConcat(imgUrl0,...imgUrlArray){
+    const cartoonManager = window.gameManager.gameMessage.content,ctx = cartoonManager.image.self.getContext('2d'),
+    tempImageArray = window.gameManager.constTemp.tempImageArray,imagePromiseArray = [],tempArray = {},
+    tempCanvas = window.gameManager.constTemp.tempCanvas,tempContext = tempCanvas.getContext('2d');
     for(let i of imgUrlArray){
         imagePromiseArray.push(new Promise(resolve=>{
             tempImageArray.has(i) && resolve(1);
@@ -46,16 +58,18 @@ function messageImageConat(imgUrl0,...imgUrlArray){
             const globalAlpha = (7 / 8) ** (i - 1);
             new Promise(resolve=>{
                 tempImageArray.has(imgUrl0) && resolve(imgUrl0);
-                var temp = (i = new Image()).src = imgUrl0 ?? '';
-                i.onload = ()=>resolve(temp);
+                imgUrl0 ?? resolve(false);
+                (i = new Image()).src = imgUrl0;
+                i.onload = function(){tempImageArray.set(imgUrl0,this);resolve(imgUrl0);};
                 i.onerror = ()=>resolve(false);
             }).then(value=>{
-                value && cartoonManager.loader('','',imgUrl0);
-                cartoonManager.image.autoReset = false;
-                globalAlpha === 1 || (ctx.globalAlpha = globalAlpha);
-                for(i of imgUrlArray){cartoonManager.loader('','',i);}
-                cartoonManager.image.autoReset = true;
-                ctx.globalAlpha = 1;
+                tempContext.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+                tempContext.closePath();
+                value && tempContext.drawImage(tempImageArray.get(value),0,0);
+                globalAlpha === 1 || (tempContext.globalAlpha = globalAlpha);
+                for(i of imgUrlArray){(i = tempImageArray.get(i)) && tempContext.drawImage(i,0,0);}
+                cartoonManager.loader('','','tempCanvas');
+                globalAlpha === 1 || (tempContext.globalAlpha = 1);
             });
         }
     });
@@ -75,41 +89,27 @@ function loadCartoon({
     var N = minN;
     switch(mode){
         case 0:
-            playFn = bgImgUrl ? ()=>{messageImageConat(bgImgUrl,head+strN(N++,longN)+tail);} :
+            playFn = bgImgUrl ? ()=>{messageImageConcat(bgImgUrl,head+strN(N++,longN)+tail);} :
             ()=>{cartoonManager.loader('','',head+strN(N++,longN)+tail);};break;
-        case 1:playFn = ()=>{messageImageConat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail);};break;
+        case 1:playFn = ()=>{messageImageConcat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail);};break;
         case 2:
             var tempN,tempPlayFn = bgImgUrl
-            ? ()=>{messageImageConat(bgImgUrl,head+strN((tempN = N),longN)+tail)}
+            ? ()=>{messageImageConcat(bgImgUrl,head+strN((tempN = N),longN)+tail)}
             : ()=>{cartoonManager.loader('','',head+strN((tempN = N),longN)+tail);};
-            playFn = ()=>{tempN === N ? messageImageConat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail) : tempPlayFn();}
+            playFn = ()=>{tempN === N ? messageImageConcat(bgImgUrl,head+strN(N++,longN)+tail,head+strN(N,longN)+tail) : tempPlayFn();}
             break;
         default:throw(new Error(`=> There is no mode '${mode}'`));
     }
     const tempFn = ()=>{
         playFn();return N > maxN ? ()=>{
-            tempPaused ? window.gameManager.gameMessage.self.classList.remove('disappear') : window.gameManager.playerMove.paused = false;
+            tempPaused ? (
+                window.gameManager.gameMessage.self.classList.remove('disappear'),
+                cartoonManager.image.self.classList.add('disappear')
+            ) : window.gameManager.playerMove.paused = false;
             [cartoonManager.image.self.width,cartoonManager.image.self.height] = [1920,1080];
         } : tempFn;
     }
     window.gameManager.tempProcess.nowFn = tempFn;
-}
-// makeElement 定制元素
-function makeElement(tagName, config){
-    // e.g.
-    // makeElement('div', {'className':'normal','textContent':'helloworld'});
-    const theElement = document.createElement(tagName);
-    for(let i in config){theElement[i]=config[i];}
-    return theElement;
-}
-// getRandomZoneUT 获取随机UT位置
-function getRandomZoneUT(){
-    return (50 * Math.random()).toFixed(1);
-}
-// getRandomDiractionUT 获取随机UT方向
-function getRandomDiractionUT(){
-    let temp = String(Math.random()).slice(2,4);
-    return [temp.charAt(0) > 4 ? 'Left' : 'Top',temp.charAt(1) > 4 ? '+' : '-'];
 }
 // memoryHandle 记忆信息操作
 function memoryHandle(
@@ -152,5 +152,19 @@ function memoryHandle(
             }
             default:throw new Error(`=> What is the mode '${mode}' ?`);
         }
+    }
+}
+// getRandomZoneUT 获取随机UT位置
+function getRandomZoneUT(){
+    return ~~(Math.random() * 961);
+}
+// getRandomDiractionUT 获取随机UT方向
+function getRandomDiractionUT(){
+    var temp = ~~(Math.random() * 1000000 % 4);
+    switch(temp){
+        case 0:return {x:1,y:0};
+        case 1:return {x:0,y:-1};
+        case 2:return {x:-1,y:0};
+        case 3:return {x:0,y:1};
     }
 }
