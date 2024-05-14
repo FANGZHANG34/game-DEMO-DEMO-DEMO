@@ -66,9 +66,11 @@
 /* 战场 */
 #UTtheater{
     width: 56.25vw;
-    background-size: 56.25vw 56.25vw;
-    background-image: url(../img/bg.png);
-}#UTfighter,.UTtheaterCorner{
+}#UTtheater>canvas{
+    position: absolute;
+    width: 56.25vw;
+    height: 56.25vw;
+}#UTfighter{
     position: absolute;
     width: 6.25vw;
     height: 6.25vw;
