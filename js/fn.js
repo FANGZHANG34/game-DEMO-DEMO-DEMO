@@ -159,12 +159,12 @@ function getRandomZoneUT(){
     return ~~(Math.random() * 961);
 }
 // getRandomDiractionUT 获取随机UT方向
-function getRandomDiractionUT(){
-    var temp = ~~(Math.random() * 1000000 % 4);
+function getRandomDiractionUT(seedNum){
+    var temp = ~~(Math.random() * 1000000 + seedNum) % 4;
     switch(temp){
-        case 0:return {x:1,y:0};
-        case 1:return {x:0,y:-1};
-        case 2:return {x:-1,y:0};
-        case 3:return {x:0,y:1};
+        case 0:return [1,0];
+        case 1:return [0,-1];
+        case 2:return [-1,0];
+        case 3:return [0,1];
     }
 }

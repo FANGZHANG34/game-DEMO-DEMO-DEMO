@@ -44,7 +44,7 @@ window.onload = function(){
                             ? previous[0] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[0] + temp[0]),limitWidth)
                             : previous[i = 1] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[1] + temp[1]),limitHeight)
                             : undefined) !== undefined
-                        ){break;};
+                        ){break;}
                     }
                     !(previous[i] === gameManager.gamePlayer.xyz[i])
                     && (!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]])
@@ -657,7 +657,7 @@ window.onload = function(){
             // stop&sth.
             var temp = e.key.toLowerCase();
             const moveD = gameManager.constTemp.moveDiraction;
-            moveD[temp] && (moveD[temp][2] = 0,moveD._ = Math.min(...moveD.a,...moveD.s,...moveD.d,...moveD.w));
+            moveD[temp] && (moveD[temp][2] = 0,moveD._ = Math.min(moveD.a[2],moveD.s[2],moveD.d[2],moveD.w[2]));
             switch(temp){
                 case 'c':gameManager.gamePlayer.photo.self.classList.toggle('disappear');break;
                 case 'q':gameManager.gameMessage.self.classList.toggle('disappear');break;

@@ -20,7 +20,8 @@
             undertaleProcess: window.gameManager.undertaleProcess = {
                 intervalID: undefined,timeSep: undefined,paused: true,
                 onEvent: ()=>{
-                    undertaleManager.fighter.x % 50 || undertaleManager.fighter.y % 50 || undertaleManager.closer();
+                    var [x,y] = undertaleManager.fighter.xy;
+                    x % 960 || y % 960 || !undertaleManager.UTtheater.corners[+!x + +(y > 0) * 2] || undertaleManager.closer();
                     undertaleManager.UTtheater.enemyAttack.isHit();
                     undertaleManager.UTtheater.enemyAttack.mover();
                 },
@@ -28,17 +29,18 @@
                 defaultFn: ()=>{
                     const moveD = gameManager.constTemp.moveDiraction;
                     if(undertaleManager.fighter.id !== undefined && moveD._){
-                        const previous = [undertaleManager.fighter.x,undertaleManager.fighter.y];
+                        const previous = undertaleManager.fighter.xy.concat();
                         var temp;
                         for(var i of 'asdw'){
                             if(
                                 (temp = (temp = moveD[i])[2] === moveD._ ? temp[i = 0]
-                                ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.x + temp[0]),50)
-                                : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.y + temp[1]),50)
+                                ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.xy[0] + temp[0] * 30),960)
+                                : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.xy[1] + temp[1] * 30),960)
                                 : undefined) !== undefined
-                            ){break;};
+                            ){break;}
                         }
-                        undertaleManager.fighter.loader(undertaleManager.fighter.id,...previous);
+                        previous[i] === undertaleManager.fighter.xy[i]
+                        || undertaleManager.fighter.loader(undertaleManager.fighter.id,...previous);
                     }
                 }
             },
@@ -51,7 +53,7 @@
                 (temp = this.body.self.classList).contains('disappear') ? undertaleManager.loadTempMemory() : temp.add('disappear');
                 this.UTtheater.loader();
                 this.fighterCondition.loader(fighterID);
-                this.UTtheater.fighter.loader(fighterID,25,25);
+                this.UTtheater.fighter.loader(fighterID);
                 this.UTtheater.enemyAttack.loader();
                 this.body.self.classList.remove('disappear');
                 setTimeout(()=>{this.undertaleProcess.paused = false;},500);
@@ -104,27 +106,24 @@
         }
         {
             const UTtheater = undertaleManager.UTtheater = {
-                self: makeElement('div',{id: 'UTtheater'}),
+                self: makeElement('div',{id: 'UTtheater'}),corners: [],
                 loader(stageName = '_'){
                     const [stageUrl,...UrlArray] = mapArrayUT.get(stageName) ?? [],context = this.stage.self.getContext('2d'),
                     tempImageArray = window.gameManager.constTemp.tempImageArray;
                     var temp;
                     if(stageUrl ?? false){
-                        this.stage.loader(stageUrl);
+                        this.stage.loader(stageUrl),this.corners = UrlArray;
                         for(let i = 0;i < 4;i++){
-                            if(temp = tempImageArray.get(UrlArray[i])){context.drawImage(temp,!(i % 2) * 960,(i > 1) * 960);}else{
-                                new Promise(resolve=>{
-                                    (temp = new Image()).onload = function(){
-                                        UrlArray[i] ? (
-                                            context.drawImage(this,!(i % 2) * 960,(i > 1) * 960),
-                                            tempImageArray.set(UrlArray[i],this),resolve()
-                                        ) : resolve();
-                                    }
-                                    temp.src = UrlArray[i];
-                                }).then(()=>{
-                                    i === 0 && (context.globalAlpha = .75),i === 2 && (context.globalAlpha = .5),i === 3 && (context.globalAlpha = 1);
-                                });
-                            }
+                            (temp = tempImageArray.get(UrlArray[i])) ? context.drawImage(temp,!(i % 2) * 960,(i > 1) * 960)
+                            : new Promise((resolve,reject)=>{
+                                (temp = new Image()).onload = function(){
+                                    UrlArray[i] ? (tempImageArray.set(UrlArray[i],this),resolve(this)) : resolve(false);
+                                }
+                                temp.onerror = ()=>reject(stageName+'.'+(i + 1)),temp.src = UrlArray[i];
+                            }).then(value=>(
+                                value && context.drawImage(value,!(i % 2) * 960,(i > 1) * 960),
+                                i === 0 && (context.globalAlpha = .75),i === 2 && (context.globalAlpha = .5),i === 3 && (context.globalAlpha = 1)
+                            ),error=>console.error('=> Please check wrong stage: '+error));
                         }
                     }else{throw new Error(`=> There is no stageName '${stageName}' !`)}
                 }
@@ -145,25 +144,26 @@
                 }
             };
             UTtheater.enemyAttack = {
-                array:[],tempImage: undefined,
+                array:[],tempImage: undefined,seedNum: 0,
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),
                 loader(enemyID){this.changer().then(()=>this.drawer(),error=>console.log(error+' is not found !'));},
-                drawer(num = 64){
+                drawer(num = 16){
                     const temp0 = window.gameManager.constTemp.tempCanvas,temp1 = temp0.getContext('2d'),selfContext = this.self.getContext('2d');
                     num ||= (this.array = [],this.array.length),this.array.length > num && (this.array = this.array.slice(0,num));
                     if(this.tempImage){
-                        temp1.clearRect(0,0,temp0.width,temp0.height);temp1.closePath();
-                        selfContext.clearRect(0,0,this.self.width,this.self.height);selfContext.closePath();
+                        temp1.clearRect(0,0,temp0.width,temp0.height),selfContext.clearRect(0,0,1080,1080),
+                        temp1.closePath(),selfContext.closePath(),selfContext.globalAlpha === 0.5 || (selfContext.globalAlpha = 0.75);
                         for(--num;num > -1;num--){
-                            let temp = this.array[num] ??= {x: getRandomZoneUT(),y: getRandomZoneUT()};
-                            temp1.drawImage(this.tempImage,temp.x,temp.y);
+                            let temp = this.array[num] ??= [getRandomZoneUT(),getRandomZoneUT()];
+                            temp1.drawImage(this.tempImage,temp[0],temp[1]);
                         }
                         selfContext.drawImage(temp0,0,0);
                     }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
                 mover(){
                     if(this.tempImage){for(let i of this.array){
-                        let temp = getRandomDiractionUT();i.x = Math.min(Math.max(0,i.x + temp.x * 30),960),i.y = Math.min(Math.max(0,i.y + temp.y * 30),960);
+                        let temp = getRandomDiractionUT(this.seedNum);this.seedNum = temp[0] ** 2;
+                        i[0] = Math.min(Math.max(0,i[0] + temp[0] * 60),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 60),960);
                     }this.drawer();}
                     else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
@@ -174,7 +174,8 @@
                     if(!skill){
                         this.tempImage = undefined;return Promise.reject('None'),
                         selfContext.clearRect(0,0,this.self.width,this.self.height),selfContext.closePath();
-                    }else return tempImage ? (this.tempImage = tempImage,Promise.resolve()) : new Promise((resolve,reject)=>{
+                    }else return tempImage ? (this.tempImage = tempImage,Promise.resolve())
+                    : new Promise((resolve,reject)=>{
                         (temp = tempImageArray.get(skill)) ? resolve(temp) : (
                             (temp = new Image()).onerror = ()=>reject(skill),
                             temp.onload = function(){skill ? (tempImageArray.set(skill,UTtheater.enemyAttack.tempImage = this),resolve()) : reject(skill);},
@@ -183,23 +184,31 @@
                     })
                 },
                 isHit(){
-                    this.array.reduce((s,i)=>s += Math.hypot((i.x - UTtheater.fighter.x * 96 / 5),(i.y - UTtheater.fighter.y * 96 / 5)) < 120,0)
+                    this.array.reduce((s,i)=>(s += Math.hypot((i[0] - UTtheater.fighter.xy[0]),(i[1] - UTtheater.fighter.xy[1])) < 120),0)
                     && (window.gameManager.hoverAudio.currentTime = 0,window.gameManager.hoverAudio.play());
                 }
             };
-            {
-                const fighter = undertaleManager.fighter = UTtheater.fighter = {
-                    id: 1,object: undefined,x: 25,y: 25,
-                    self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighter'})),
-                    loader(id,x,y){
-                        const UTmoveKeyframe = window.gameManager.constTemp.UTmoveKeyframes[0];
-                        this.id === id || (this.display.style.backgroundImage = `url(${memoryHandle('characterArray.'+(this.id = id)+'.display')})`);
-                        UTmoveKeyframe.translate = `${this.x = x}vw ${this.y = y}vw 0vw`;
-                        return this.self.animate(UTmoveKeyframe,window.gameManager.constTemp.UTmoveConfig).finished;
-                    }
-                };
-                fighter.display = fighter.self.insertAdjacentElement('beforeend',makeElement('div',{id: 'UTfighterDisplay'}));
-            }
+            undertaleManager.fighter = UTtheater.fighter = {
+                id: undefined,xy: [480,480],display: makeElement('canvas',{width: 1080,height: 1080}),
+                self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),tempImage: undefined,
+                loader(id,x = 480,y = 480){
+                    var temp;
+                    const tempContext = this.display.getContext('2d'),tempImageArray = window.gameManager.constTemp.tempImageArray,
+                    imageUrl = memoryHandle('characterArray.'+id+'.display'),context = this.self.getContext('2d');
+                    tempContext.clearRect(0,0,1080,1080),context.clearRect(0,0,1080,1080),tempContext.closePath(),context.closePath();
+                    Promise.resolve(this.id !== id ? (temp = tempImageArray.get(imageUrl)) ? (this.tempImage = temp) : new Promise(resolve=>{
+                        (temp = new Image()).onerror = ()=>resolve(false);
+                        temp.onload = ()=>{resolve(imageUrl ? (tempImageArray.set(imageUrl,temp),this.tempImage = temp) : false)};
+                        temp.src = imageUrl;
+                    }) : this.tempImage).then(
+                        value=>value ? (
+                            tempContext.drawImage(value,480,480),this.id = id,
+                            context.drawImage(this.display,(this.xy[0] = x) - 480,(this.xy[1] = y) - 480)
+                        )
+                        : console.error(id+' has wrong display !')
+                    );
+                }
+            };
         }
         {
             const fighterBoard = undertaleManager.fighterBoard = {
