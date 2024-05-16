@@ -107,25 +107,18 @@
         {
             const UTtheater = undertaleManager.UTtheater = {
                 self: makeElement('div',{id: 'UTtheater'}),corners: [],
-                loader(stageName = '_'){
-                    const [stageUrl,...UrlArray] = mapArrayUT.get(stageName) ?? [],context = this.stage.self.getContext('2d'),
-                    tempImageArray = window.gameManager.constTemp.tempImageArray;
-                    var temp;
-                    if(stageUrl ?? false){
+                async loader(stageName = '_'){
+                    const [stageUrl,...UrlArray] = mapArrayUT.get(stageName) ?? [],context = this.stage.self.getContext('2d');
+                    if(stageUrl){
                         this.stage.loader(stageUrl),this.corners = UrlArray;
                         for(let i = 0;i < 4;i++){
-                            (temp = tempImageArray.get(UrlArray[i])) ? context.drawImage(temp,!(i % 2) * 960,(i > 1) * 960)
-                            : new Promise((resolve,reject)=>{
-                                (temp = new Image()).onload = function(){
-                                    UrlArray[i] ? (tempImageArray.set(UrlArray[i],this),resolve(this)) : resolve(false);
-                                }
-                                temp.onerror = ()=>reject(stageName+'.'+(i + 1)),temp.src = UrlArray[i];
-                            }).then(value=>(
-                                value && context.drawImage(value,!(i % 2) * 960,(i > 1) * 960),
+                            await getImage(UrlArray[i]).then(value=>(
+                                value ? context.drawImage(value,!(i % 2) * 960,(i > 1) * 960) : console.error('=> Please check wrong corner : '+i),
                                 i === 0 && (context.globalAlpha = .75),i === 2 && (context.globalAlpha = .5),i === 3 && (context.globalAlpha = 1)
-                            ),error=>console.error('=> Please check wrong stage: '+error));
+                            ));
                         }
                     }else{throw new Error(`=> There is no stageName '${stageName}' !`)}
+                    return;
                 }
             };
             UTtheater.stage = {
@@ -146,7 +139,9 @@
             UTtheater.enemyAttack = {
                 array:[],tempImage: undefined,seedNum: 0,
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),
-                loader(enemyID){this.changer().then(()=>this.drawer(),error=>console.log(error+' is not found !'));},
+                loader(enemyID){
+                    this.changer().then(value=>!value ? this.drawer() : console.log(value+' is not found !'));
+                },
                 drawer(num = 16){
                     const temp0 = window.gameManager.constTemp.tempCanvas,temp1 = temp0.getContext('2d'),selfContext = this.self.getContext('2d');
                     num ||= (this.array = [],this.array.length),this.array.length > num && (this.array = this.array.slice(0,num));
@@ -167,21 +162,10 @@
                     }this.drawer();}
                     else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
-                changer(skill = './img/无名剑客.jpg'){
-                    var temp;
-                    const tempImageArray = window.gameManager.constTemp.tempImageArray,tempImage = tempImageArray.get(skill),
-                    selfContext = this.self.getContext('2d');
-                    if(!skill){
-                        this.tempImage = undefined;return Promise.reject('None'),
-                        selfContext.clearRect(0,0,this.self.width,this.self.height),selfContext.closePath();
-                    }else return tempImage ? (this.tempImage = tempImage,Promise.resolve())
-                    : new Promise((resolve,reject)=>{
-                        (temp = tempImageArray.get(skill)) ? resolve(temp) : (
-                            (temp = new Image()).onerror = ()=>reject(skill),
-                            temp.onload = function(){skill ? (tempImageArray.set(skill,UTtheater.enemyAttack.tempImage = this),resolve()) : reject(skill);},
-                            temp.src = skill
-                        );
-                    })
+                async changer(skill = './img/无名剑客.jpg'){
+                    const selfContext = this.self.getContext('2d');
+                    return (this.tempImage = await getImage(skill) || undefined,skill) ? getImage(skill) ? false : skill :
+                    (selfContext.clearRect(0,0,1080,1080),selfContext.closePath(),this.tempImage = undefined,'None');
                 },
                 isHit(){
                     this.array.reduce((s,i)=>(s += Math.hypot((i[0] - UTtheater.fighter.xy[0]),(i[1] - UTtheater.fighter.xy[1])) < 120),0)
@@ -191,21 +175,15 @@
             undertaleManager.fighter = UTtheater.fighter = {
                 id: undefined,xy: [480,480],display: makeElement('canvas',{width: 1080,height: 1080}),
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),tempImage: undefined,
-                loader(id,x = 480,y = 480){
-                    var temp;
-                    const tempContext = this.display.getContext('2d'),tempImageArray = window.gameManager.constTemp.tempImageArray,
-                    imageUrl = memoryHandle('characterArray.'+id+'.display'),context = this.self.getContext('2d');
+                async loader(id,x = 480,y = 480){
+                    const tempContext = this.display.getContext('2d'),context = this.self.getContext('2d'),
+                    imageUrl = memoryHandle('characterArray.'+id+'.display');
                     tempContext.clearRect(0,0,1080,1080),context.clearRect(0,0,1080,1080),tempContext.closePath(),context.closePath();
-                    Promise.resolve(this.id !== id ? (temp = tempImageArray.get(imageUrl)) ? (this.tempImage = temp) : new Promise(resolve=>{
-                        (temp = new Image()).onerror = ()=>resolve(false);
-                        temp.onload = ()=>{resolve(imageUrl ? (tempImageArray.set(imageUrl,temp),this.tempImage = temp) : false)};
-                        temp.src = imageUrl;
-                    }) : this.tempImage).then(
-                        value=>value ? (
+                    Promise.resolve(this.id !== id ? (this.tempImage = (await getImage(imageUrl)) || undefined) : this.tempImage).
+                    then(value=>value ? (
                             tempContext.drawImage(value,480,480),this.id = id,
                             context.drawImage(this.display,(this.xy[0] = x) - 480,(this.xy[1] = y) - 480)
-                        )
-                        : console.error(id+' has wrong display !')
+                        ) : console.error(id+' has wrong display !')
                     );
                 }
             };
@@ -227,7 +205,7 @@
         window.gameManager.setGameInterval('undertaleProcess',33);
 
         {
-            document.onmousemove = e=>{
+            document.addEventListener('onmousemove',e=>{
                 // mouse2tip
                 var temp = e.target;
                 const gameTip = window.gameManager.gameBody.gameTip;
@@ -237,7 +215,7 @@
                     case 'fighterThis':gameTip.tipFn(e);break;
                     default:gameTip.tipFn(e,false);
                 }
-            };
+            },true);
             document.addEventListener('click',e=>{
                 // click2change
                 var temp = e.target;

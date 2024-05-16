@@ -8,10 +8,8 @@ window.onload = function(){
     const gameManager = window.gameManager = {
         constTemp: {
             memory: undefined,gameTip: false,moveDiraction: {_: 0,a: [-1,0,0],s: [0,1,0],d: [1,0,0],w: [0,-1,0]},
-            tempImageArray: new Map(),tempCanvas: makeElement('canvas',{width: 1920,height: 1080}),
-            moveKeyframes: [{translate: undefined}],
-            gameBodyKeyframes: [{translate: undefined}],
-            moveConfig: {duration: 66,fill: 'forwards'}
+            tempImageArray: new Map(),tempAudioArray: new Map(),tempCanvas: makeElement('canvas',{width: 1920,height: 1080}),
+            moveKeyframes: [{translate: undefined}],gameBodyKeyframes: [{translate: undefined}],moveConfig: {duration: 66,fill: 'forwards'}
         },
         setGameInterval(type,timeSep){
             let temp;
@@ -53,7 +51,14 @@ window.onload = function(){
                 }
             }
         },
-        hoverAudio: new Audio('./audio/1.ogg'),clickAudio: new Audio('./audio/Cancel2.ogg')
+        hoverAudio: new Audio('./audio/1.ogg'),clickAudio: new Audio('./audio/Cancel2.ogg'),
+        bgm: (()=>{
+            const bgmAudio = new Audio(),keyArray = [];
+            return (key,value)=>{
+                switch(key){}
+            }
+        })(),
+        bgs(){}
     };
     gameManager.constTemp.tempImageArray.set('tempCanvas',gameManager.constTemp.tempCanvas);
 
@@ -423,41 +428,19 @@ window.onload = function(){
                 clearMedia(this.video);clearMedia(this.audio);
             }
             content.loader = function(text,audioUrl,imageUrl,videoUrl){
-                this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume;
-                this.textId && clearInterval(this.textId);
-                this.textId = undefined;
-                if(text){
-                    text = Array.from(text);
-                    this.textId = setInterval(()=>{
-                        this.text.textContent += text.shift() || (clearInterval(this.textId),'');
-                        this.self.scrollTo({top:this.self.scrollHeight,behavior:'smooth'});
-                    }, configArray.globalArray.textSep);
-                }
-                if(imageUrl){
-                    var imageIf = gameManager.constTemp.tempImageArray.get(imageUrl);
-                    const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d');
-                    temp0.classList.remove('disappear');
-                    if(imageIf){
-                        autoReset && (temp1.clearRect(0,0,temp0.width,temp0.height),temp1.closePath());
-                        temp1.drawImage(imageIf,0,0);
-                    }else{
-                        (imageIf = new Image()).onload = ()=>{
-                            autoReset && (temp1.clearRect(0,0,temp0.width,temp0.height),temp1.closePath());
-                            temp1.drawImage(imageIf,0,0);
-                            gameManager.constTemp.tempImageArray.set(imageUrl,imageIf);
-                        };
-                        imageIf.src = imageUrl;
-                    }
-                }
-                if(videoUrl){
-                    this.video.src = videoUrl;
-                    this.video.play();
-                    this.video.classList.remove('disappear');
-                }
-                if(audioUrl){
-                    this.audio.src = audioUrl;
-                    this.audio.play();
-                }
+                const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d');
+                this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume,
+                this.textId && clearInterval(this.textId),this.textId = undefined,
+                text && (text = Array.from(text),this.textId = setInterval(()=>(
+                    this.text.textContent += text.shift() || (clearInterval(this.textId),''),
+                    this.self.scrollTo({top:this.self.scrollHeight,behavior:'smooth'})
+                ), configArray.globalArray.textSep)),
+                imageUrl && (temp0.classList.remove('disappear'),getImage(imageUrl).then(value=>(
+                    autoReset && (temp1.clearRect(0,0,temp0.width,temp0.height),temp1.closePath()),
+                    value && temp1.drawImage(value,0,0)
+                ))),
+                videoUrl && (this.video.src = videoUrl,this.video.play(),this.video.classList.remove('disappear')),
+                audioUrl && (this.audio.src = audioUrl,this.audio.play());
             }
         }
         {
