@@ -8,7 +8,7 @@
 //     f+=d*e,setTimeout(g,e))}g()}(a,b,c,0,1/e,20,d))
 // }
 // strN 数字转规范字符串
-function strN(N,longN){return longN <= String(N).length ? String(N) : strN('0'+N, longN);}
+function strN(N,longN){return longN > String(N).length ? strN(N = '0'+N,longN) : N;}
 // clearMedia 清空媒体内容
 function clearMedia(mediaElement){mediaElement.pause(),mediaElement.removeAttribute('src'),mediaElement.load();}
 // getWindowWidth / getWindowHeight 获取窗口宽/高
@@ -28,7 +28,7 @@ function makeElement(tagName, config){
     // e.g.
     // makeElement('div', {'className':'normal','textContent':'helloworld'});
     const theElement = document.createElement(tagName);
-    for(let i in config){theElement[i] = config[i];}
+    for(var i in config){theElement[i] = config[i];}
     return theElement;
 }
 // getImage 兑现图片
@@ -38,6 +38,15 @@ function getImage(imgUrl){
         var i = tempImageArray.get(imgUrl);
         !imgUrl ? resolve(false) : i ? resolve(i) :
         ((i = new Image()).onerror = ()=>resolve(false),i.onload = ()=>(tempImageArray.set(imgUrl,i),resolve(i)),i.src = imgUrl);
+    });
+}
+// getAudio 兑现音频
+function getAudio(audioUrl){
+    const tempAudioArray = window.gameManager.constTemp.tempAudioArray;
+    return new Promise(resolve=>{
+        var i = tempAudioArray.get(audioUrl);
+        !audioUrl ? resolve(false) : i ? resolve(i.cloneNode()) :
+        ((i = new Audio()).onerror = ()=>resolve(false),i.onload = ()=>(tempAudioArray.set(audioUrl,i),resolve(i.cloneNode())),i.src = audioUrl);
     });
 }
 // messageImageConcat 图片整合显示
@@ -136,11 +145,6 @@ function memoryHandle(
 // getRandomZoneUT 获取随机UT位置
 function getRandomZoneUT(){return ~~(Math.random() * 961);}
 // getRandomDiractionUT 获取随机UT方向
-function getRandomDiractionUT(seedNum){
-    switch(~~(Math.random() * 1000000 + seedNum) % 4){
-        case 0:return [1,0];
-        case 1:return [0,-1];
-        case 2:return [-1,0];
-        case 3:return [0,1];
-    }
+function getRandomDiractionUT(seedN){
+    return seedN = ~~(Math.random() * 1000000 + seedN) % 4,seedN-- ? seedN-- ? seedN ? [0,1] : [-1,0] : [0,-1] : [1,0];
 }
