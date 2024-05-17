@@ -33,10 +33,12 @@
                         var temp;
                         for(var i of 'asdw'){
                             if(
-                                (temp = (temp = moveD[i])[2] === moveD._ ? temp[i = 0]
-                                ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.xy[0] + temp[0] * 30),960)
-                                : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.xy[1] + temp[1] * 30),960)
-                                : undefined) !== undefined
+                                (
+                                    (temp = moveD[i])[2] === moveD._ ? temp[i = 0]
+                                    ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.xy[0] + temp[0] * 30),960)
+                                    : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.xy[1] + temp[1] * 30),960)
+                                    : undefined
+                                ) !== undefined
                             ){break;}
                         }
                         previous[i] === undertaleManager.fighter.xy[i]
