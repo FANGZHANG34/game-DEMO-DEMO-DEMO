@@ -22,7 +22,7 @@ HTML游戏引擎半成品的半成品
   于是，我走上了充满迷雾的道路……
 - ### 游戏引擎结构
   ####  一、gameManager 对象（gameManager Object）
-  gameManager 对象直接作为 window 对象的属性，且一般包含了 game-DEMO-DEMO-DEMO 游戏引擎（以下简称“引擎”）的所有数据，所以可以直接在控制台中直接访问，方便在出现 BUG 时查看游戏引擎实时数据。
+  gameManager 对象直接作为 window 对象的属性，且一般包含了 game-DEMO-DEMO-DEMO 游戏引擎（以下简称“引擎”）的所有数据，所以可以在控制台中直接访问，方便在出现 BUG 时查看游戏引擎实时数据。
   ```
   console.log(window.gameManager); // {...}
   console.log(gameManager); // {...}
@@ -34,38 +34,34 @@ HTML游戏引擎半成品的半成品
   ```
   person.self = elementNode;
   ```
-  这些对象整体并非一成不变，如果想实时了解“这些‘人’有哪些，其本身都是什么类型的元素节点”，可以使用searchSelf()函数，其将返回字符串数组，以便了解这些“人”：
+  这些对象整体并非一成不变，如果想实时了解“有哪些‘人’，其本身都是什么类型的元素节点”，可以使用searchSelf()函数，其将返回字符串数组，以便了解这些“人”：
   ```
   searchSelf();
+  ```
+  ```
   // return below: [...]
+  // "gameManager[key]... tagName"
   0: "gameManager.gameBody div"
   1: "gameManager.gameBody.gameTip div"
   2: "gameManager.gameBody.menuBoard div"
-  3: "gameManager.gameBody.menuBoard.title div"
-  4: "gameManager.gameBody.menuBoard.characterGame div"
-  5: "gameManager.gameBody.menuBoard.gallery div"
-  6: "gameManager.gameBody.menuBoard.config div"
-  7: "gameManager.gameBody.menuBoard.openGame div"
-  8: "gameManager.gameMap.board div"
-  9: "gameManager.gamePlayer div"
-  10: "gameManager.gamePlayer.photo canvas"
-  11: "gameManager.gameFileSL div"
-  12: "gameManager.gameInfoSL div"
-  13: "gameManager.gameMessage div"
-  14: "gameManager.gameMessage.sender div"
-  15: "gameManager.gameMessage.content div"
-  16: "gameManager.gameMessage.content.image canvas"
-  17: "gameManager.undertaleManager.body div"
-  18: "gameManager.undertaleManager.fighterCondition div"
-  19: "gameManager.undertaleManager.UTtheater div"
-  20: "gameManager.undertaleManager.UTtheater.stage canvas"
-  21: "gameManager.undertaleManager.UTtheater.enemyAttack canvas"
-  22: "gameManager.undertaleManager.UTtheater.fighter canvas"
-  23: "gameManager.undertaleManager.fighter canvas"
-  24: "gameManager.undertaleManager.fighterBoard div"
+  ...
   25: "gameManager.undertaleManager.fighterBoard.fighterSkill div"
   26: "gameManager.undertaleManager.fighterBoard.fighterItem div"
   27: "gameManager.undertaleManager.fighterBoard.fighterPartner div"
   length: 28
   [[Prototype]]: Array(0)
   ```
+  因此没有 self 属性的对象（包括 gameManager 对象）并不会直接出现在 HTML 页面中，而是通过这些“人”体现在 HTML 页面中。
+
+  ####  三、通过“人”的属性和方法来指挥“人”
+  人有特征，“人”有属性；人懂方法，“人”也有方法。“人”可以接收我们的指挥（参数），根据其属性，通过其方法，以实现我们的目的。
+
+  注意，人与人之间迥然不同，“人”与“人”之间也不同，更何况“人”与非“人”，所以本“人”的方法只能由本“人”使用，如果需要回调某“人”的方法，请这样使用：
+  ```
+  foo( ()=>{ person.method(...); } );
+  function foo(callback){
+      ...
+  }
+  ```
+  这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
+  ####  四、 gameManager 对象当中的非“人”
