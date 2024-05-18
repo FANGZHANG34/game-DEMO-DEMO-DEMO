@@ -49,6 +49,15 @@ function getAudio(audioUrl){
         ((i = new Audio()).onerror = ()=>resolve(false),i.onload = ()=>(tempAudioArray.set(audioUrl,i),resolve(i.cloneNode())),i.src = audioUrl);
     });
 }
+// searchSelf 寻找含self属性的真实对象
+function searchSelf(keyArray = ['gameManager']){
+    var temp = [],obj = window,i;for(i of keyArray){obj = obj[i]}
+    switch(obj?.constructor){
+        case Object:case Array:'self' in obj && temp.push(keyArray.join('.')+' '+obj.self.tagName.toLowerCase());
+        for(i in obj){switch(obj[i]?.constructor){case Object:case Array:temp.push(...searchSelf([...keyArray,i]));}}
+    }
+    return temp;
+}
 // messageImageConcat 图片整合显示
 async function messageImageConcat(imgUrl0,...imgUrlArray){
     const cartoonManager = window.gameManager.gameMessage.content,imageGetArray = [],
