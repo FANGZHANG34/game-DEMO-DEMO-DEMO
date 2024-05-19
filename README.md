@@ -80,7 +80,7 @@ HTML游戏引擎半成品的半成品
   “法人”有很多，但并不需要清楚到底有多少。我们只需要了解几个最重要的“法人”—— gameManager 对象和它的属性“法人”：
   ```
   for(let artPerson in window.gameManager){
-      artPerson instanceof Object ? window.gameManager.artPerson.self ? null : console.log('gameManager.'+artPerson) : null;
+      artPerson instanceof Object ? window.gameManager[artPerson]?.self ? null : console.log('gameManager.'+artPerson) : null;
   }
   ```
   - gameManager “法人”的方法和它的重要“非人” constTemp
