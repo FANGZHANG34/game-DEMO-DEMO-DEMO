@@ -84,6 +84,7 @@ HTML游戏引擎半成品的半成品
   }
   ```
   - gameManager “法人”的方法和它的重要“非人”
+    
     gameManager 目前只有两个方法：setGameInterval() 和 bgs()。
 
     setGameInterval(type,timeSep) 能够创建或者刷新一个循环定时器，这个定时器的 ID 被保存在 gameManager 的 \[ type \] 属性“法人”中。每过 timeSep 毫秒后，该定时器会根据保管其 ID 的“法人”的属性以执行这个“法人”的方法。
