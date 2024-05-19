@@ -94,5 +94,5 @@ HTML游戏引擎半成品的半成品
     > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
     > if(playerMove.paused){ return; } // playerMove 根据它的 paused 属性决定是否工作
     > playerMove.onEvent?.() // playerMove 尝试使用 onEvent 方法
-    > playerMove.nowFn &&= playerMove.nowFn?.() || temp.defaultFn?.() // playerMove 尝试使用现在的 nowFn 方法来决定下一次的 nowFn 方法，如果现在的或下一次的 nowFn 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn 方法
+    > (playerMove.nowFn &&= playerMove.nowFn?.()) || temp.defaultFn?.() // playerMove 尝试使用现在的 nowFn 方法来决定下一次的 nowFn 方法，如果现在的或下一次的 nowFn 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn 方法
     > ```
