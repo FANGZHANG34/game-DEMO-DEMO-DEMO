@@ -33,6 +33,8 @@ HTML游戏引擎半成品的半成品
   这些对象都真实地出现在了页面中，而非仅仅作为内存中的数据，所以我称它们为“人”（person），其本身（self）正是某些元素节点（elementNode）。即：
   ```
   person.self = elementNode;
+  'self' in person; // true
+  person.self instanceof HTMLElement; // true
   ```
   这些对象整体并非一成不变，如果想实时了解“有哪些‘人’，其本身都是什么类型的元素节点”，可以使用searchSelf()函数，其将返回字符串数组，以便了解这些“人”：
   ```
@@ -56,12 +58,40 @@ HTML游戏引擎半成品的半成品
   ####  三、通过“人”的属性和方法来指挥“人”
   人有特征，“人”有属性；人懂方法，“人”也有方法。“人”可以接收我们的指挥（参数），根据其属性，通过其方法，以实现我们的目的。
 
-  注意，人与人之间迥然不同，“人”与“人”之间也不同，更何况“人”与非“人”，所以本“人”的方法只能由本“人”使用，如果需要回调某“人”的方法，请这样使用：
+  > 人与人之间迥然不同，“人”与“人”之间也不同，更何况“人”与非“人”，所以本“人”的方法只能由本“人”使用，如果需要回调某“人”的方法，请这样使用：
+  > ```
+  > foo( ()=>{ person.method(...); } );
+  > function foo(callback){
+  >     ...
+  > }
+  > ```
+  > 这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
+  ####  四、 gameManager 对象中的非“人”对象（notPerson Object）
+  非“人”（notPerson）对象虽然没有 self 属性，但也有属性甚至方法。因此我将包含方法的非“人”称作“法人”（artificial person，简称 artPerson），意为模仿“人”的类“人”；将不含方法的非“人”称作“非人”（nonPerson）。
   ```
-  foo( ()=>{ person.method(...); } );
-  function foo(callback){
-      ...
+  'self' in notPerson; // false
+  artPerson.method();
+  for(let key in nonPerson){
+      nonPerson[key](); // Uncaught TypeError: nonPerson[key] is not a function
   }
   ```
-  这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
-  ####  四、 gameManager 对象当中的非“人”
+  > 回调“法人”的方法时应当遵循“人”的规则：本“人”的方法只能由本“人”使用。
+  ##### （一）“法人”介绍
+  “法人”有很多，但并不需要清楚到底有多少。我们只需要了解几个最重要的“法人”—— gameManager 对象和它的属性“法人”：
+  ```
+  for(let artPerson in window.gameManager){
+      (artPerson instanceof Object && artPerson.self === undefined) || console.log('gameManager.'+artPerson);
+  }
+  ```
+  - gameManager “法人”的方法和它的重要“非人”
+    gameManager 目前只有两个方法：setGameInterval() 和 bgs()。
+
+    setGameInterval(type,timeSep) 能够创建或者刷新一个循环定时器，这个定时器的 ID 被保存在 gameManager 的 \[ type \] 属性“法人”中。每过 timeSep 毫秒后，该定时器会根据保管其 ID 的“法人”的属性以执行这个“法人”的方法。
+    > 默认有四个保管着循环定时器 ID 的“法人”—— globalProcess, dialogueProcess, tempProcess, playerMove 。
+    下面以 playerMove “法人”来举例说明循环定时器会做什么：
+    > ```
+    > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
+    > if(playerMove.paused){ return; } // playerMove 根据它的 paused 属性决定是否工作
+    > playerMove.onEvent?.() // playerMove 尝试使用 onEvent 方法
+    > playerMove.nowFn &&= playerMove.nowFn?.() || temp.defaultFn?.() // playerMove 尝试使用现在的 nowFn 方法来决定下一次的 nowFn 方法，如果现在的或下一次的 nowFn 方法可以转变为 false，那么将有空使用 defaultFn 方法
+    > ```
