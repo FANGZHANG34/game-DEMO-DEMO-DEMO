@@ -83,12 +83,12 @@ HTML游戏引擎半成品的半成品
       (artPerson instanceof Object && artPerson.self === undefined) || console.log('gameManager.'+artPerson);
   }
   ```
-  - gameManager “法人”的方法和它的重要“非人”
+  - gameManager “法人”的方法和它的重要“非人” constTemp
     
     gameManager 目前只有两个方法：setGameInterval() 和 bgs()。
 
     setGameInterval(type,timeSep) 能够创建或者刷新一个循环定时器，这个定时器的 ID 被保存在 gameManager 的 \[ type \] 属性“法人”中。每过 timeSep 毫秒后，该定时器会根据保管其 ID 的“法人”的属性来指挥这个“法人”使用方法。
-    > 默认有四个保管着循环定时器 ID 的“法人”—— globalProcess, dialogueProcess, tempProcess, playerMove 。
+    > 默认有五个保管着循环定时器 ID 的“法人”—— globalProcess, dialogueProcess, tempProcess, playerMove, autoSL 。
     下面以 playerMove “法人”来举例说明循环定时器会做什么：
     > ```
     > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
@@ -96,3 +96,7 @@ HTML游戏引擎半成品的半成品
     > playerMove.onEvent?.() // playerMove 尝试使用 onEvent 方法
     > (playerMove.nowFn &&= playerMove.nowFn?.()) || temp.defaultFn?.() // playerMove 尝试使用现在的 nowFn 方法来决定下一次的 nowFn 方法，如果现在的或下一次的 nowFn 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn 方法
     > ```
+    constTemp “非人”保管着各种重要对象的引用，以便“人”和“法人”在使用方法时能够快速访问一些对象或节省一些性能开销（不确定），同时方便定义新的函数和 DEBUG。
+
+    如果想要了解 constTemp 的属性有什么作用，请先了解使用这些属性的“人”和“法人”，实践是认识的第一步。
+  - gameManager.gameMap “法人”介绍
