@@ -67,7 +67,7 @@ HTML游戏引擎半成品的半成品
   > ```
   > 这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
   ####  四、 `gameManager` 对象中的非“人”对象（`notPerson` Object）
-  非“人”（notPerson）对象虽然没有 self 属性，但也有属性甚至方法。因此我将包含方法的非“人”称作“法人”（artificial person，简称 `artPerson`），意为模仿“人”的类“人”；将不含方法的非“人”称作“非人”（`nonPerson`）。
+  非“人”（`notPerson`）对象虽然没有 self 属性，但也有属性甚至方法。因此我将包含方法的非“人”称作“法人”（artificial person，简称 `artPerson`），意为模仿“人”的类“人”；将不含方法的非“人”称作“非人”（`nonPerson`）。
   ```
   'self' in notPerson; // false
   artPerson.method();
@@ -97,8 +97,8 @@ HTML游戏引擎半成品的半成品
     
     `gameManager` 目前只有两个方法：`setGameInterval()` 和 `bgs()`。
 
-    `setGameInterval(type,timeSep)` 能够创建或者刷新一个循环定时器，这个定时器的 `ID` 被保存在 gameManager 的 `[type]` 属性“法人”中。每过 timeSep 毫秒后，该定时器会根据保管其 `ID` 的“法人”的属性来指挥这个“法人”使用方法。
-    > 默认有五个保管着循环定时器 ID 的“法人”—— `gameManager.globalProcess`, `gameManager.dialogueProcess`, `gameManager.tempProcess`, `gameManager.playerMove`, `gameManager.autoSL`。
+    `setGameInterval(type,timeSep)` 能够创建或者刷新一个循环定时器，这个定时器的 `ID` 被保存在 gameManager 的 `[type]` 属性“法人”中。每过 `timeSep` 毫秒后，该定时器会根据保管其 `ID` 的“法人”的属性来指挥这个“法人”使用方法。
+    > 默认有五个保管着循环定时器 `ID` 的“法人”—— `gameManager.globalProcess`, `gameManager.dialogueProcess`, `gameManager.tempProcess`, `gameManager.playerMove`, `gameManager.autoSL`。
     下面以 `gameManager.playerMove`（下面简写为 `playerMove` ）“法人”来举例说明循环定时器会做什么：
     > ```
     > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
