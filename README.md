@@ -66,6 +66,7 @@ HTML游戏引擎半成品的半成品
   > }
   > ```
   > 这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
+  
   ####  四、 `gameManager` 对象中的非“人”对象（`notPerson` Object）
   非“人”（`notPerson`）对象虽然没有 self 属性，但也有属性甚至方法。因此我将包含方法的非“人”称作“法人”（artificial person，简称 `artPerson`），意为模仿“人”的类“人”；将不含方法的非“人”称作“非人”（`nonPerson`）。
   ```
@@ -104,7 +105,8 @@ HTML游戏引擎半成品的半成品
     > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
     > if(playerMove.paused){ return; } // playerMove 根据它的 paused 属性决定是否工作
     > playerMove.onEvent?.() // playerMove 尝试使用 onEvent 方法
-    > (playerMove.nowFn &&= playerMove.nowFn?.()) || temp.defaultFn?.() // playerMove 尝试使用现在的 nowFn() 方法来决定下一次的 nowFn() 方法，如果下一次的 nowFn() 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn() 方法
+    > (playerMove.nowFn &&= playerMove.nowFn?.()) || temp.defaultFn?.()
+    > // playerMove 尝试使用现在的 nowFn() 方法来决定下一次的 nowFn() 方法，如果下一次的 nowFn() 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn() 方法
     > ```
     “非人” `gameManager.constTemp` 保管着各种重要对象的引用，以便“人”和“法人”在使用方法时能够快速访问一些对象或节省一些性能开销（不确定），同时方便定义新的函数和 DEBUG。
 
