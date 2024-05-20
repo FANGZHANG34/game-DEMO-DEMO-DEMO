@@ -169,7 +169,7 @@ for(let artPerson of Object.keys(window.gameManager)){
     
   - .js 插件写法
  
-首先我们需要创建一个块并用常量保存原来的 window.onload 函数：
+首先我们需要创建一个块并用常量保存并执行原来的 window.onload 函数：
 ```
 {
     const oldWindowOnload = window.onload;
@@ -179,5 +179,30 @@ for(let artPerson of Object.keys(window.gameManager)){
     }
 }
 ```
+这样我们就可以在确保 `gameManager` 对象生成后在 `Symbol(1)` 处对其进行魔改了。下面我们来预设几种想法：
 
-    
+1. 重写某个方法
+
+实际上我并不推荐新手这样做，即便要这么做也应该先了解“人”与“人”之间是怎么工作的，以免出现 BUG 导致“人”们无法工作。
+
+有经验的开发者都知道怎么重写方法：
+```
+const oldMethod = person.method;
+person.method = function(){
+    ...
+    const result = oldMethod.apply(this,arguments);
+    ...
+    return result;
+}
+```
+我更加推荐新手先通过 `document.addEventListener()` 方法来增加交互，或通过（可选：增添 `objectArray.eventArray` 的事件并配合） `gameManager.setGameInterval()` 方法设立定时器“法人”，让其根据“人”的变化做出反应。
+
+等熟悉了“人”与“人”之间是怎么工作的之后，再尝试重写方法。
+
+2. 添加交互、进程
+
+通过 `document.addEventListener()` 方法来增加交互，通过（可选：增添 `objectArray.eventArray` 的事件并配合） `gameManager.setGameInterval()` 方法设立定时器“法人”来模拟进程。
+
+3. 添加新功能、新模块、新界面
+
+定义若干“人”和非“人”对象，它们直接或间接归同一个“法人”管辖。建议将这个“法人”并入 `gameManager` 作为其属性“法人”，方便统筹规划。
