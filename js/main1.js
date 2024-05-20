@@ -190,7 +190,7 @@ window.onload = function(){
             // .nodeArray 地图对象元素集合
             // .nodeTemp 地图对象元素模板
             // .loader() 加载地图对象
-            const mapObjectManager = gameMap.objectManager = {
+            const objectManager = gameMap.objectManager = {
                 nodeArray: [],
                 nodeTemp: makeElement('div',{className: 'mapObject'}),
                 characterLoader(characterInfoArray){
@@ -205,7 +205,7 @@ window.onload = function(){
                     }
                 }
             };
-            mapObjectManager.nodeTemp.insertAdjacentHTML('beforeend','<canvas height="120" width="120"></canvas>');
+            objectManager.nodeTemp.insertAdjacentHTML('beforeend','<canvas height="120" width="120"></canvas>');
         }
     }
     console.log(2);
@@ -322,7 +322,7 @@ window.onload = function(){
             self: document.getElementById('infoSL'),
             saveDataTemp: {
                 mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],record: {},
-                memory: {itemList: {onceArray: {},twiceceArray: {},onfitArray: {}},characterArray: {1:{selfEvent: '4'}},mapDataArray: {}}
+                memory: {itemList: {onceArray: {},twiceArray: {},onfitArray: {}},characterArray: {1:{selfEvent: '4'}},mapDataArray: {}}
             },
             shower(){
                 this.stage.textContent = this.index === '0' ? '当前信息（只读，自动更新）：' : '信息：';
@@ -455,8 +455,7 @@ window.onload = function(){
                 setChoiceArray(choiceArray,finallyFn){
                     this.ended = false;
                     finallyFn && (this.finallyFn = finallyFn);
-                    const isEnded = ()=>(this.ended ? this.finallyFn || (()=>{gameMessage.closer();}) : isEnded);
-                    gameManager.dialogueProcess.nowFn = isEnded;
+                    const isEnded = gameManager.dialogueProcess.nowFn = ()=>(this.ended ? this.finallyFn || (()=>{gameMessage.closer();}) : isEnded);
                     gameManager.playerMove.paused = true;
                     for(var i of Object.keys(choiceArray)){
                         this.choice.insertAdjacentElement('beforeend',makeElement('div',{textContent: i,onclick: choiceArray[i]}));
