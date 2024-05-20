@@ -29,7 +29,7 @@ HTML游戏引擎半成品的半成品
 
 - ### 游戏引擎结构
 
-  ####  一、`gameManager` 对象（`gameManager` Object）
+####  一、`gameManager` 对象（`gameManager` Object）
   
 `gameManager` 对象直接作为 `window` 对象的属性，且一般包含了 game-DEMO-DEMO-DEMO 游戏引擎（以下简称“引擎”）的所有数据，所以可以在控制台中直接访问，方便在出现 BUG 时查看游戏引擎实时数据。
 
