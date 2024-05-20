@@ -130,7 +130,7 @@ HTML游戏引擎半成品的半成品
       characterArray: {...},
       itemList: {
           onceArray: {...},
-          twiceceArray: {...},
+          twiceArray: {...},
           onfitArray: {...}
       }
   }
