@@ -30,9 +30,9 @@
     align-content: center;
     background-color: #212;
     font-size: 10vw;
+    line-height: 2.5vw;
     color: #090;
     z-index: 10;
-    line-height: 5vw;
 }
 /*游戏提示*/
 #gameTip{
@@ -54,7 +54,7 @@
 /*游戏主体*/
 canvas.mapImg{
     position: absolute;
-}#player,.mapObject{
+}#player,.mapObject,#player>canvas,.mapObject>canvas{
     position: absolute;
     width: 60px;
     height: 60px;
@@ -133,6 +133,7 @@ canvas.mapImg{
     font-size: 2.5vw;
     text-align: center;
     align-content: center;
+    scale: 1;
 }#messageOption>div>div:hover{
     scale: 1.2;
     background-color: rgba(0, 0, 0, 0.6);
@@ -158,6 +159,7 @@ canvas.mapImg{
 }#option>div{
     height: 7.5vw;
     align-content: center;
+    scale: 1;
 }#option>div:hover{
     scale: 1.5;
     background-color: rgba(225, 225, 225, 0.5);
@@ -262,6 +264,7 @@ canvas.mapImg{
 }#SL>div{
     height: 5vw;
     align-content: center;
+    scale: 1;
 }#SL>div:hover{
     scale: 1.5;
     background-color: rgba(225, 225, 225, 0.2);
