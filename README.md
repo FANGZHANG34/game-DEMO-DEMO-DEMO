@@ -123,7 +123,19 @@ HTML游戏引擎半成品的半成品
 
   这些全局常量对象不宜在游戏内修改，也不方便存入存档，所以我设计了 `memory` 对象
 
-  `memory` 对象的形式是 `{mapDataArray: {...},characterArray: {...},itemList: {onceArray: {...},twiceceArray: {...},onfitArray: {...}}}`。引擎中默认有21个 `memory` 对象，全部由“人” `gameManager.gameInfoSL` 负责管理。
+  `memory` 对象的形式是：
+  ```
+  {
+      mapDataArray: {...},
+      characterArray: {...},
+      itemList: {
+          onceArray: {...},
+          twiceceArray: {...},
+          onfitArray: {...}
+      }
+  }
+  ```
+  引擎中默认有21个 `memory` 对象，全部由“人” `gameManager.gameInfoSL` 负责管理。
 
   通过 `memoryHandle()` 函数，可以在不破坏全局常量对象的前提下，快捷地读取、修改存档内容。
   （注意：`objectArray.eventArray` 不可能，也不允许修改，所以并未设计进 `memory` 对象。）
