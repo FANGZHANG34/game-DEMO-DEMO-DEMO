@@ -112,10 +112,10 @@
                 async loader(stageName = '_'){
                     const [stageUrl,...UrlArray] = mapArrayUT.get(stageName) ?? [],context = this.stage.self.getContext('2d');
                     if(stageUrl){
-                        this.stage.loader(stageUrl),this.corners = UrlArray;
-                        for(let i = 0;i < 4;i++){
+                        await this.stage.loader(stageUrl),this.corners = UrlArray;
+                        for(var i = 0;i < 4;i++){
                             await getImage(UrlArray[i]).then(value=>(
-                                value ? context.drawImage(value,!(i % 2) * 960,(i > 1) * 960) : console.error('=> Please check wrong corner : '+i),
+                                value ? context.drawImage(value,!(i % 2) * 960,(i > 1) * 960) : UrlArray[i] && console.error('=> Wrong corner : '+i),
                                 i === 0 && (context.globalAlpha = .75),i === 2 && (context.globalAlpha = .5),i === 3 && (context.globalAlpha = 1)
                             ));
                         }
@@ -125,18 +125,7 @@
             };
             UTtheater.stage = {
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),
-                loader(imageUrl){
-                    const context = this.self.getContext('2d'),temp = window.gameManager.constTemp.tempImageArray;
-                    var imageIf = temp.get(imageUrl);
-                    context.clearRect(0,0,this.self.width,this.self.height);context.closePath();
-                    if(imageIf){context.drawImage(imageIf,0,0);}else{
-                        (imageIf = new Image()).onload = ()=>{
-                            context.drawImage(imageIf,0,0);
-                            temp.set(imageUrl,imageIf);
-                        };
-                        imageIf.src = imageUrl;
-                    }
-                }
+                loader(imageUrl){getImage(imageUrl).then(value=>(value && clearCanvas(this.self).drawImage(value,0,0)));}
             };
             UTtheater.enemyAttack = {
                 array:[],tempImage: undefined,seedNum: 0,
@@ -145,24 +134,26 @@
                     this.changer().then(value=>!value ? this.drawer() : console.log(value+' is not found !'));
                 },
                 drawer(num = 16){
-                    const temp0 = window.gameManager.constTemp.tempCanvas,temp1 = temp0.getContext('2d'),selfContext = this.self.getContext('2d');
+                    const temp0 = window.gameManager.constTemp.tempCanvas;
                     num ||= (this.array = [],this.array.length),this.array.length > num && (this.array = this.array.slice(0,num));
                     if(this.tempImage){
-                        temp1.clearRect(0,0,temp0.width,temp0.height),selfContext.clearRect(0,0,1080,1080),
-                        temp1.closePath(),selfContext.closePath(),selfContext.globalAlpha === 0.5 || (selfContext.globalAlpha = 0.75);
+                        const temp1 = clearCanvas(temp0);
                         for(--num;num > -1;num--){
-                            let temp = this.array[num] ??= [getRandomZoneUT(),getRandomZoneUT()];
+                            var temp = this.array[num] ??= [getRandomZoneUT(),getRandomZoneUT()];
                             temp1.drawImage(this.tempImage,temp[0],temp[1]);
                         }
-                        selfContext.drawImage(temp0,0,0);
+                        clearCanvas(this.self).drawImage(temp0,0,0);
                     }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
                 mover(){
-                    if(this.tempImage){for(let i of this.array){
-                        let temp = getRandomDiractionUT(this.seedNum);this.seedNum = temp[0] ** 2;
-                        i[0] = Math.min(Math.max(0,i[0] + temp[0] * 60),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 60),960);
-                    }this.drawer();}
-                    else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
+                    if(this.tempImage){
+                        var temp;
+                        for(var i of this.array){
+                            this.seedNum = (temp = getRandomDiractionUT(this.seedNum))[0] ** 2;
+                            i[0] = Math.min(Math.max(0,i[0] + temp[0] * 60),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 60),960);
+                        }
+                        this.drawer();
+                    }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
                 async changer(skill = './img/无名剑客.jpg'){
                     const selfContext = this.self.getContext('2d');
@@ -178,15 +169,12 @@
                 id: undefined,xy: [480,480],display: makeElement('canvas',{width: 1080,height: 1080}),
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),tempImage: undefined,
                 async loader(id,x = 480,y = 480){
-                    const tempContext = this.display.getContext('2d'),context = this.self.getContext('2d'),
-                    imageUrl = memoryHandle('characterArray.'+id+'.display');
-                    tempContext.clearRect(0,0,1080,1080),context.clearRect(0,0,1080,1080),tempContext.closePath(),context.closePath();
-                    Promise.resolve(this.id !== id ? (this.tempImage = (await getImage(imageUrl)) || undefined) : this.tempImage).
-                    then(value=>value ? (
-                            tempContext.drawImage(value,480,480),this.id = id,
-                            context.drawImage(this.display,(this.xy[0] = x) - 480,(this.xy[1] = y) - 480)
-                        ) : console.error(id+' has wrong display !')
-                    );
+                    Promise.resolve(this.id !== id ? (
+                        this.tempImage = (await getImage(memoryHandle('characterArray.'+id+'.display'))) || undefined
+                    ) : this.tempImage).then(value=>(value ? (
+                        clearCanvas(this.display).drawImage(value,480,480),this.id = id,
+                        clearCanvas(this.self).drawImage(this.display,(this.xy[0] = x) - 480,(this.xy[1] = y) - 480)
+                    ) : console.error(id+' has wrong display !')));
                 }
             };
         }
@@ -197,7 +185,7 @@
                 fighterItem: {self: makeElement('div',{id: 'fighterItem'})},
                 fighterPartner: {self: makeElement('div',{id: 'fighterPartner'})}
             }
-            for(let i in fighterBoard){i === 'self' || fighterBoard.self.insertAdjacentElement('beforeend',fighterBoard[i].self);}
+            for(let i of Object.keys(fighterBoard)){i === 'self' || fighterBoard.self.insertAdjacentElement('beforeend',fighterBoard[i].self);}
         }
         {}{}{}
         window.gameManager.gameBody.self.insertAdjacentElement('afterend',undertaleManager.body.self).
@@ -207,7 +195,7 @@
         window.gameManager.setGameInterval('undertaleProcess',33);
 
         {
-            document.addEventListener('onmousemove',e=>{
+            document.addEventListener('mousemove',e=>{
                 // mouse2tip
                 var temp = e.target;
                 const gameTip = window.gameManager.gameBody.gameTip;
