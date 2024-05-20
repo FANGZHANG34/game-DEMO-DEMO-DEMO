@@ -19,16 +19,22 @@ function copyObj(obj = {}){
     var newobj;
     if(obj instanceof Object && obj !== null){
         newobj = obj instanceof Array ? [] : {};
-        for(var i in obj){i[0] === '_' || (newobj[i] = copyObj(obj[i]));}
+        for(var i of Object.keys(obj)){i.charAt() === '_' || (newobj[i] = copyObj(obj[i]));}
     }else{newobj = obj;}
     return newobj;
+}
+// clearCanvas 清空canvas并返回ctx
+function clearCanvas(canvas){
+    var ctx; return canvas.constructor === HTMLCanvasElement
+    ? ((ctx = canvas.getContext('2d')).clearRect(0,0,canvas.width,canvas.height),ctx.closePath(),ctx)
+    : console.error('=> Please put HTMLCanvasElement in function "clearCanvas" !');
 }
 // makeElement 定制元素
 function makeElement(tagName, config){
     // e.g.
     // makeElement('div', {'className':'normal','textContent':'helloworld'});
     const theElement = document.createElement(tagName);
-    for(var i in config){theElement[i] = config[i];}
+    for(var i of Object.keys(config)){theElement[i] = config[i];}
     return theElement;
 }
 // getImage 兑现图片
@@ -50,11 +56,12 @@ function getAudio(audioUrl){
     });
 }
 // searchSelf 寻找含self属性的真实对象
-function searchSelf(keyArray = ['gameManager']){
-    var temp = [],obj = window,i;for(i of keyArray){obj = obj[i]}
+function searchSelf(keyList = ['gameManager']){
+    var temp = [],obj = window,keyArray,key;
+    for(key of keyList){obj = obj[key]}
     switch(obj?.constructor){
-        case Object:case Array:'self' in obj && temp.push(keyArray.join('.')+' '+obj.self.tagName.toLowerCase());
-        for(i in obj){switch(obj[i]?.constructor){case Object:case Array:temp.push(...searchSelf([...keyArray,i]));}}
+        case Object:case Array:(keyArray = Object.keys(obj)).includes('self') && temp.push([keyList.join('.')+' ',obj.self]);
+        for(key of keyArray){switch(obj[key]?.constructor){case Object:case Array:temp.push(...searchSelf([...keyList,key]));}}
     }
     return temp;
 }
@@ -142,7 +149,7 @@ function memoryHandle(
         switch(mode){
             case 'w':
                 if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
-                else if(key0 in thisMemory){return parentObject[key2] = value_fn;}
+                else if(Object.keys(thisMemory).includes(key0)){return parentObject[key2] = value_fn;}
                 else{throw new Error(`=> Memory has no '${key0}' !`);}
             case 'fn':
                 if(!key2){throw new Error(`=> Need the third KEY in '${pathString}' !`);}
