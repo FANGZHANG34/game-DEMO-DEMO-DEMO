@@ -121,7 +121,7 @@ HTML游戏引擎半成品的半成品
 
   默认的全局常量对象有 `mapDataArray`（./js/map.js）, `objectArray.characterArray`（./js/object.js）, `objectArray.eventArray`（./js/object.js）。
 
-  这些全局常量对象不宜在游戏内修改，也不方便存入存档，所以我设计了 `memory` 对象
+  这些全局常量对象不宜在游戏内修改，也不方便存入存档，所以我设计了 `memory` 对象。
 
   `memory` 对象的形式是：
   ```
