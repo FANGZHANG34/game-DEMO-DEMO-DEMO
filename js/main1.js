@@ -64,7 +64,10 @@ window.onload = function(){
             }
             return temp;
         },
-        bgs(audioUrl){getAudio(audioUrl).then(value=>(value.currentTime = 0,value.onended = ()=>clearMedia(value),value.play()));}
+        bgs(audioUrl){getAudio(audioUrl).then(value=>(
+            value.currentTime = 0,value.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs,
+            value.onended = ()=>clearMedia(value),value.play()
+        ));}
     };
     gameManager.constTemp.tempImageArray.set('tempCanvas',gameManager.constTemp.tempCanvas);
 
@@ -76,7 +79,6 @@ window.onload = function(){
     // limitWidth,limitHeight 地图坐标限制
     // mapRealWidth,mapRealHeight 地图实际长度
     const configArray = JSON.parse(LZString.decompress(localStorage.getItem('configArray')));
-    gameManager.hoverAudio.volume = gameManager.clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
     const singleStepLength = 60;
     const [mapWidth,mapHeight] = [32,18];
     const [limitWidth,limitHeight] = [mapWidth-1,mapHeight-1];
@@ -113,13 +115,24 @@ window.onload = function(){
                 title: {self: document.getElementById('guide')},
                 characterGame: {self: document.getElementById('characterBoard')},
                 gallery: {self: document.getElementById('myGallery')},
-                config: {self: document.getElementById('myConfig')}
+                config: {
+                    self: document.getElementById('myConfig'),
+                    loader(){
+                        this.applyVolume();
+                    },
+                    applyVolume(){
+                        gameManager.gameMessage.content.video.volume = gameManager.gameMessage.content.audio.volume =
+                        configArray.globalArray.globalVolume * configArray.globalArray.dialogue,
+                        gameManager.bgm.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgm,
+                        gameManager.hoverAudio.volume = gameManager.clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
+                    }
+                }
             }
         };
         gameBody.gameTip.style = temp.style;
         (temp = Array.from(gameBody.menuBoard.config.self.children)).shift();
         for(let element of temp){gameBody.menuBoard.config[element.id] = element.children[1];}
-        setTimeout(()=>gameBody.menuBoard.openGame = {self: gameManager.gameFileSL.self});
+        setTimeout(()=>(gameBody.menuBoard.openGame = {self: gameManager.gameFileSL.self},gameBody.menuBoard.config.loader()));
     }
     console.log(1);
     {
@@ -420,7 +433,7 @@ window.onload = function(){
                 },
                 loader(text,audioUrl,imageUrl,videoUrl){
                     const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d');
-                    this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogueVolume,
+                    this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogue,
                     this.textId && clearInterval(this.textId),this.textId = undefined,
                     text && (text = Array.from(text),this.textId = setInterval(()=>(
                         this.text.textContent += text.shift() || (clearInterval(this.textId),''),
@@ -577,7 +590,7 @@ window.onload = function(){
                             default:configArray.globalArray[i] = +temp.textContent / 100;
                         }
                     }
-                    gameManager.hoverAudio.volume = gameManager.clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
+                    gameManager.gameBody.menuBoard.config.loader();
                     localStorage.setItem('configArray',LZString.compress(JSON.stringify(configArray)));
                     alert('设置保存成功！');config.click();
                     break;
@@ -593,7 +606,7 @@ window.onload = function(){
                             default:temp[1].textContent = temp[0] * 100;temp[2].scrollTop = (1 - temp[0]) * 1000;
                         }
                     }
-                    gameManager.hoverAudio.volume = gameManager.clickAudio.volume = configArray.globalArray.globalVolume * configArray.globalArray.bgs;
+                    gameManager.gameBody.menuBoard.config.loader();
                     break;
                 }
                 default:console.log(temp.id);

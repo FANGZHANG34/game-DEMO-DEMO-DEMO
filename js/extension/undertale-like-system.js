@@ -1,18 +1,20 @@
-(()=>{
+{
     const oldWindowOnload = window.onload;
     window.onload = ()=>{
         oldWindowOnload();
-        window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
-        window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
-        const old_gameInfoSL_loader = window.gameManager.gameInfoSL.loader;
-        window.gameManager.gameInfoSL.loader = function(){
-            old_gameInfoSL_loader.call(this);
-            undertaleManager.body.self.classList.add('disappear');
-            undertaleManager.undertaleProcess.paused = true;
-            const temp = window.gameManager.constTemp.memory.characterArray;
-            objectArray.characterArray.forEach((value,key)=>{
-                value.strength = new Strength(temp[key]?.strength ?? arrayUT.characterArrayUT.get(key));
-            });
+        {
+            window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
+            window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
+            const old_gameInfoSL_loader = Symbol('old_gameInfoSL_loader');
+            window.gameManager.gameInfoSL[old_gameInfoSL_loader] = window.gameManager.gameInfoSL.loader;
+            window.gameManager.gameInfoSL.loader = function(){
+                this[old_gameInfoSL_loader]();
+                undertaleManager.body.self.classList.add('disappear'),undertaleManager.undertaleProcess.paused = true;
+                const temp = window.gameManager.constTemp.memory.characterArray;
+                objectArray.characterArray.forEach((value,key)=>{
+                    value.strength = new Strength(temp[key]?.strength ?? arrayUT.characterArrayUT.get(key));
+                });
+            }
         }
         const undertaleManager = window.gameManager.undertaleManager = {
             body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: undefined,enemyID: undefined,
@@ -54,7 +56,7 @@
                 window.gameManager.playerMove.paused = true;
                 (temp = this.body.self.classList).contains('disappear') ? undertaleManager.loadTempMemory() : temp.add('disappear');
                 this.UTtheater.loader();
-                this.fighterCondition.loader(fighterID);
+                this.fighterCondition.array = undefined,this.fighterCondition.loader(fighterID);
                 this.UTtheater.fighter.loader(fighterID);
                 this.UTtheater.enemyAttack.loader();
                 this.body.self.classList.remove('disappear');
@@ -70,7 +72,7 @@
         {
             let temp;
             const fighterCondition = undertaleManager.fighterCondition = {
-                id: undefined,array: undefined,nodeArray: undefined,self: makeElement('div',{id: 'fighterConditionStage'}),
+                self: makeElement('div',{id: 'fighterConditionStage'}),array: undefined,nodeArray: undefined,
                 loader(){
                     if(this.array){return;}else{
                         var temp = [],id;
@@ -146,18 +148,18 @@
                     }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
                 mover(){
+                    var i,temp;
                     if(this.tempImage){
-                        var temp;
-                        for(var i of this.array){
+                        for(i of this.array){
                             this.seedNum = (temp = getRandomDiractionUT(this.seedNum))[0] ** 2;
-                            i[0] = Math.min(Math.max(0,i[0] + temp[0] * 60),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 60),960);
+                            i[0] = Math.min(Math.max(0,i[0] + temp[0] * 30),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 30),960);
                         }
                         this.drawer();
                     }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
                 },
                 async changer(skill = './img/无名剑客.jpg'){
                     const selfContext = this.self.getContext('2d');
-                    return (this.tempImage = await getImage(skill) || undefined,skill) ? getImage(skill) ? false : skill :
+                    return this.tempImage = await getImage(skill) || undefined,skill ? getImage(skill) ? false : skill :
                     (selfContext.clearRect(0,0,1080,1080),selfContext.closePath(),this.tempImage = undefined,'None');
                 },
                 isHit(){
@@ -215,4 +217,4 @@
             },true);
         }
     }
-})();
+}

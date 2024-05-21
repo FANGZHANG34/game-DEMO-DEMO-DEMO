@@ -60,7 +60,7 @@ function searchSelf(keyList = ['gameManager']){
     var temp = [],obj = window,keyArray,key;
     for(key of keyList){obj = obj[key]}
     switch(obj?.constructor){
-        case Object:case Array:(keyArray = Object.keys(obj)).includes('self') && temp.push([keyList.join('.')+' ',obj.self]);
+        case Object:case Array:(keyArray = Object.keys(obj)).includes('self') && temp.push([keyList.join('.'),obj.self]);
         for(key of keyArray){switch(obj[key]?.constructor){case Object:case Array:temp.push(...searchSelf([...keyList,key]));}}
     }
     return temp;
