@@ -162,7 +162,7 @@ for(let artPerson of Object.keys(window.gameManager)){
 引擎中默认有21个 `memory` 对象，全部由“人” `gameManager.gameInfoSL` 负责管理。
 
 通过 `memoryHandle()` 函数，可以在不破坏全局常量对象的前提下，快捷地读取、修改存档内容。
-（注意：`objectArray.eventArray` 不可能，也不允许修改，所以并未设计进 `memory` 对象。）
+（注意：`objectArray.eventArray` 不可能，也不允许在游戏内修改，所以并未设计进 `memory` 对象。）
 
   ####  六、插件编写指南
   - 插件安装位置
@@ -185,7 +185,7 @@ for(let artPerson of Object.keys(window.gameManager)){
 <script src="./js/extension/mapUT.js" type="text/javascript"></script>
 <script src="./js/extension/undertale-like-system.js" type="text/javascript"></script>
 ```
-也就是说，我们只要把写好的 .js（.css）文件通过`<head>`（`<head>`）标签插入到`<!-- 扩展模块 -->`的下文中，就可以实现想要的功能。那么 .css 文件还好，.js 文件应该怎么样写呢？
+也就是说，我们只要把写好的 .js（.css）文件通过`<script>`（`<link>`）标签插入到`<!-- 扩展模块 -->`的下文中，就可以实现想要的功能。那么 .css 文件还好，.js 文件应该怎么样写呢？
     
   - .js 插件写法
  
@@ -215,6 +215,19 @@ person.method = function(){
     return result;
 }
 ```
+在这里我推荐一种重写方法的写法：
+```
+const oldMethod = Symbol('oldMethod'); // 获得标识的同时注释为 'oldMethod'
+person[oldMethod] = person.method;
+person.method = function(...){
+    ...
+    const result = this[oldMethod](...);
+    ...
+    return result;
+}
+```
+虽然略长，但这样一来，此“人”并未遗忘原来的方法，只不过是在使用新方法时使用了旧方法。
+
 我更加推荐新手先通过 `document.addEventListener()` 方法来增加交互，或通过（可选：增添 `objectArray.eventArray` 的事件并配合） `gameManager.setGameInterval()` 方法设立定时器“法人”，让其根据“人”的变化做出反应。
 
 等熟悉了“人”与“人”之间是怎么工作的之后，再尝试重写方法。
@@ -223,6 +236,6 @@ person.method = function(){
 
 通过 `document.addEventListener()` 方法来增加交互，通过（可选：增添 `objectArray.eventArray` 的事件并配合） `gameManager.setGameInterval()` 方法设立定时器“法人”来模拟进程。
 
-3. 添加新功能、新模块、新界面
+3. 添加新功能、新模块、新元素、新界面
 
 定义若干“人”和非“人”对象，它们直接或间接归同一个“法人”管辖。建议将这个“法人”并入 `gameManager` 作为其属性“法人”，方便统筹规划。
