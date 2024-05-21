@@ -31,7 +31,7 @@ HTML游戏引擎半成品的半成品
 
 ####  一、`gameManager` 对象（`gameManager` Object）
   
-`gameManager` 对象直接作为 `window` 对象的属性，且一般包含了 game-DEMO-DEMO-DEMO 游戏引擎（以下简称“引擎”）的所有数据，所以可以在控制台中直接访问，方便在出现 BUG 时查看游戏引擎实时数据。
+`gameManager` 对象直接作为 `window` 对象的属性，且一般包含了 game-DEMO-DEMO-DEMO 游戏引擎（以下简称“引擎”）的所有数据，所以可以在控制台中直接访问，方便在 DEBUG 时查看引擎实时数据。
 
 ```
 console.log(window.gameManager); // {...}
@@ -71,14 +71,16 @@ length: 28
   
 人有特征，“人”有属性；人懂方法，“人”也有方法。“人”可以接收我们的指挥（参数），然后根据其属性，使用其方法，以实现我们的目的。
 
-> 人与人之间迥然不同，“人”与“人”之间也不同，更何况“人”与非“人”，所以本“人”的方法只能由本“人”使用，如果需要回调某“人”的方法，请这样使用：
+> 人与人之间迥然不同，“人”与“人”之间亦然，更何况“人”与非“人”，所以本“人”的方法只能由本“人”使用，如果需要回调某“人”的方法，请这样使用：
 > ```
-> foo( ()=>{ person.method(...); } );
+> foo( ()=>person.method(...) );
 > function foo(callback){
->     callback()
+>     ...
+>     callback();
+>     ...
 > }
 > ```
-> 这样，给人的感觉就是“某‘人’用什么方法”，而非“执行某‘人’的方法”。
+> 这样，给人的感觉就是“某‘人’使用了方法”，而非“执行某‘人’的方法”。
   
   ####  四、 `gameManager` 对象中的非“人”对象（`notPerson` Object）
   
@@ -114,15 +116,16 @@ for(let artPerson of Object.keys(window.gameManager)){
     
 `gameManager` 目前只有两个方法：`setGameInterval()` 和 `bgs()`。
 
-`setGameInterval(type,timeSep)` 能够创建或者刷新一个循环定时器，这个定时器的 `ID` 被保存在 gameManager 的 `[type]` 属性“法人”中。每过 `timeSep` 毫秒后，该定时器会根据保管其 `ID` 的“法人”的属性来指挥这个“法人”使用方法。
+`setGameInterval(type,timeSep)` 能够创建或者刷新一个循环定时器，这个定时器的 `ID` 被保存在属性“法人” `gameManager[type]` 中。每过 `timeSep` 毫秒后，该定时器会指挥 `gameManager[type]`。
 > 默认有五个保管着循环定时器 `ID` 的“法人”—— `gameManager.globalProcess`, `gameManager.dialogueProcess`, `gameManager.tempProcess`, `gameManager.playerMove`, `gameManager.autoSL`。
-下面以 `gameManager.playerMove`（下面简写为 `playerMove` ）“法人”来举例说明循环定时器会做什么：
+> 下面以“法人” `gameManager.playerMove`（简写为 `playerMove` ）举例来说明循环定时器会如何指挥：
 > ```
 > playerMove.promise = await playerMove.promise; // playerMove 等待它的 promise 兑现
 > if(playerMove.paused){ return; } // playerMove 根据它的 paused 属性决定是否工作
 > playerMove.onEvent?.() // playerMove 尝试使用 onEvent 方法
 > (playerMove.nowFn &&= playerMove.nowFn?.()) || temp.defaultFn?.()
-> // playerMove 尝试使用现在的 nowFn() 方法来决定下一次的 nowFn() 方法，如果下一次的 nowFn() 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn() 方法
+> // playerMove 尝试使用现在的 nowFn() 方法并得到下一次的 nowFn() 方法
+> 如果下一次的 nowFn() 方法可以转变为 false，那么 playerMove 将有空尝试使用 defaultFn() 方法
 > ```
 
   - `gameManager` 的重要属性“非人” `constTemp`
@@ -226,7 +229,7 @@ person.method = function(...){
     return result;
 }
 ```
-虽然略长，但这样一来，此“人”并未遗忘原来的方法，只不过是在使用新方法时使用了旧方法。
+虽然略长，但这样一来，此“人”并未遗忘旧方法，只不过是在使用新方法时使用了旧方法，而且旧方法不会出现在闭包处，符合人的直觉。
 
 我更加推荐新手先通过 `document.addEventListener()` 方法来增加交互，或通过（可选：增添 `objectArray.eventArray` 的事件并配合） `gameManager.setGameInterval()` 方法设立定时器“法人”，让其根据“人”的变化做出反应。
 
