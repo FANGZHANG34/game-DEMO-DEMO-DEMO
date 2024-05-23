@@ -1,6 +1,6 @@
 {
     const oldWindowOnload = window.onload;
-    window.onload = ()=>{oldWindowOnload().then(()=>{
+    window.onload = ()=>oldWindowOnload().then(()=>{
         // undertaleSystem start
         window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
         window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
@@ -218,5 +218,5 @@
         }
         // undertaleSystem end
         return Promise.all(window.gameManager.promiseArray);
-    });}
+    });
 }
