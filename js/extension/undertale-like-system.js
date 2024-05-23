@@ -218,5 +218,5 @@
         }
         // undertaleSystem end
         return Promise.all(window.gameManager.promiseArray);
-    });
+    },()=>console.error('=> sth. wrong before "undertale-like-system"!'));
 }
