@@ -196,10 +196,14 @@ for(let artPerson of Object.keys(window.gameManager)){
 ```
 {
     const oldWindowOnload = window.onload;
-    window.onload = ()=>{
-        oldWindowOnload();
+    window.onload = ()=>oldWindowOnload().then(()=>{
+        // myScript start
+
         ... // Symbol(1)
-    }
+
+        // myScript end
+        return Promise.all(window.gameManager.promiseArray);
+    },()=>console.error('=> sth. wrong before "myScript"!'));
 }
 ```
 这样我们就可以在确保 `gameManager` 对象生成后在 `Symbol(1)` 处对其进行魔改了。下面我们来预设几种想法：
