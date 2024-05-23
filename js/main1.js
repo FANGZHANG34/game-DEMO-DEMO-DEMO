@@ -1,4 +1,4 @@
-window.onload = function(){
+window.onload = ()=>{
     // 设置全局的函数、常量和变量
     // gameManager 游戏元素管理员，其属性包含了所有游戏元素
     // 大多数游戏元素都有self属性以指向其本体HTMLElement
@@ -13,7 +13,9 @@ window.onload = function(){
     // .setGameInterval() 设置游戏循环计时器的ID
     // .bgs() 一次性地使用游戏音效
     const gameManager = window.gameManager = {
-        gameTip: false,constTemp: {
+        gameTip: false,
+        promiseArray:[],
+        constTemp: {
             memory: undefined,tempImageArray: new Map(),tempAudioArray: new Map(),
             moveDiraction: {_: 0,a: [-1,0,0],s: [0,1,0],d: [1,0,0],w: [0,-1,0]},tempCanvas: makeElement('canvas',{width: 1920,height: 1080}),
             moveKeyframes: [{translate: undefined}],gameBodyKeyframes: [{translate: undefined}],moveConfig: {duration: 66,fill: 'forwards'}
@@ -23,7 +25,7 @@ window.onload = function(){
         dialogueProcess:{intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,defaultFn: undefined},
         tempProcess:{intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,defaultFn: undefined},
         playerMove:{
-            intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,promise: false,
+            intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,promise: false,stepIndex: 0,
             defaultFn: ()=>{
                 const moveD = gameManager.constTemp.moveDiraction;
                 if(gameManager.gamePlayer.id !== undefined && moveD._){
@@ -41,13 +43,15 @@ window.onload = function(){
                     }
                     !(previous[i] === gameManager.gamePlayer.xyz[i])
                     && (!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]])
+                    && !(gameManager.playerMove.stepIndex > 0 && gameManager.playerMove.stepIndex--)
                     && gameManager.gameMap.onDirectionEvent(previous) && (
                         gameManager.playerMove.promise = gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,true).
-                        then(()=>gameManager.gameMap.onPointEvent(previous))
+                        then(()=>gameManager.gameMap.onPointEvent(previous)),gameManager.playerMove.stepIndex = 3
                     );
                 }
             }
         },
+        makePromise(fn){this.promiseArray.push(new Promise(resolve=>setTimeout(()=>resolve(fn?.()))));},
         setGameInterval(type,timeSep){
             var temp;
             if(!gameManager[type]){gameManager[type] = {intervalID: undefined,timeSep: undefined,paused: false,onEvent: ()=>{},nowFn: undefined};}
@@ -56,11 +60,12 @@ window.onload = function(){
             if(timeSep !== 0 && isFinite(timeSep) && timeSep !== temp.timeSep){
                 temp.timeSep = timeSep;
                 clearInterval(temp.intervalID);
-                temp.intervalID = setInterval(async()=>{
-                    temp.promise = await temp.promise;
-                    if(temp.paused){return;}
-                    else {temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.()) || temp.defaultFn?.();}
-                },timeSep);
+                temp.intervalID = setInterval(async()=>void(
+                    temp.stepIndex ? temp.defaultFn?.() : (
+                        temp.promise = await temp.promise,
+                        temp.paused || (temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.()) || temp.defaultFn?.())
+                    )
+                ),timeSep);
             }
             return temp;
         },
@@ -132,7 +137,7 @@ window.onload = function(){
         gameBody.gameTip.style = temp.style;
         (temp = Array.from(gameBody.menuBoard.config.self.children)).shift();
         for(let element of temp){gameBody.menuBoard.config[element.id] = element.children[1];}
-        setTimeout(()=>(gameBody.menuBoard.openGame = {self: gameManager.gameFileSL.self},gameBody.menuBoard.config.loader()));
+        gameManager.makePromise(()=>{gameBody.menuBoard.openGame = {self: gameManager.gameFileSL.self},gameBody.menuBoard.config.loader()});
     }
     console.log(1);
     {
@@ -145,14 +150,13 @@ window.onload = function(){
             mapID: undefined,
             mapConcat: Array.from(document.getElementsByClassName('mapImg')),
             loader(mapID){
-                var imgUrl = memoryHandle('mapDataArray.'+(this.mapID = mapID)+'.0');
+                var imgUrl = memoryHandle('mapDataArray.'+(gameManager.gameFileSL.origin[0].mapID = this.mapID = mapID)+'.0');
                 getImage(imgUrl).then(value=>{
                     if(value){for(imgUrl = 0;imgUrl < 4;imgUrl++){
                         clearCanvas(this.mapConcat[imgUrl]).drawImage(value,0,-imgUrl * mapRealHeight);
                     }}else{console.error('=> Wrong map imgUrl: '+mapImageUrl);}
                 });
                 gameManager.globalProcess.nowFn = objectArray.eventArray.get(memoryHandle('mapDataArray.'+mapID+'.4'))?.[1];
-                setTimeout(()=>{gameManager.gameFileSL.origin[0].mapID = mapID;});
             },
             onDirectionEvent(xyz){
                 nodeArrayLoop:for(var nodeCharacter of this.objectManager.nodeArray){
@@ -286,7 +290,7 @@ window.onload = function(){
     {
         // 设置循环计时器
         gameManager.setGameInterval('globalProcess',100);
-        gameManager.setGameInterval('playerMove',66);
+        gameManager.setGameInterval('playerMove',16);
         gameManager.setGameInterval('dialogueProcess',66);
         gameManager.setGameInterval('tempProcess',100);
     }
@@ -331,14 +335,13 @@ window.onload = function(){
         // .saver() 保存存档
         // .deleter() 删除存档
         const gameInfoSL = gameManager.gameInfoSL = {
-            temp: undefined,index: undefined,
-            self: document.getElementById('infoSL'),
+            self: document.getElementById('infoSL'),index: undefined,temp: undefined,
             saveDataTemp: {
                 mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],record: {},
                 memory: {itemList: {onceArray: {},twiceArray: {},onfitArray: {}},characterArray: {1:{selfEvent: '4'}},mapDataArray: {}}
             },
             shower(){
-                this.stage.textContent = this.index === '0' ? '当前信息（只读，自动更新）：' : '信息：';
+                this.stage.textContent = this.index === '0' ? '（自动更新，只读）当前信息：' : '信息：';
                 if(gameManager.gameInfoSL.temp){
                     for(var i of Object.values(this.temp)){this.stage.textContent += '\n'+String(i);}
                 }else{this.stage.textContent += '\n'+'NULL'}
@@ -348,8 +351,8 @@ window.onload = function(){
                 var temp = this.temp || this.saveDataTemp;
                 gameManager.constTemp.memory = (gameManager.gameFileSL.origin[0] = Object.assign(copyObj(temp),{xyz: gameManager.gamePlayer.xyz})).memory;
                 gameManager.gameMap.loader(temp.mapID);
-                gameManager.gameMap.board.loader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.1')[temp.xyz[2]]);
-                gameManager.gameMap.objectManager.characterLoader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.2'));
+                gameManager.gameMap.board.loader(memoryHandle('mapDataArray.'+temp.mapID+'.1')[temp.xyz[2]]);
+                gameManager.gameMap.objectManager.characterLoader(memoryHandle('mapDataArray.'+temp.mapID+'.2'));
                 gameManager.gamePlayer.loader(temp.id,temp.xyz,true);
                 gameManager.gameBody.menu.classList.add('disappear');
             },
@@ -442,12 +445,13 @@ window.onload = function(){
                     imageUrl && (temp0.classList.remove('disappear'),getImage(imageUrl).then(value=>(
                         autoReset && (temp1.clearRect(0,0,temp0.width,temp0.height),temp1.closePath()),value && temp1.drawImage(value,0,0)
                     ))),
-                    videoUrl && (this.video.src = videoUrl,this.video.play(),this.video.classList.remove('disappear')),
+                    videoUrl && (this.video.src = videoUrl,console.time('v'),this.video.classList.remove('disappear')),
                     audioUrl && (this.audio.src = audioUrl,this.audio.play());
                 }
             };
             [content.image.self.width,content.image.self.height] = [1920,1080],
-            content.video.onended = function(){this.classList.add('disappear');};
+            content.video.oncanplay = function(){console.timeEnd('v'),this.play(),this.classList.remove('disappear');};
+            content.video.onended = function(){gameMessage.option.ended = true,this.classList.add('disappear');};
         }
         {
             // option 阅读选项
@@ -641,7 +645,7 @@ window.onload = function(){
             switch(temp){
                 case 'c':gameManager.gamePlayer.photo.self.classList.toggle('disappear');break;
                 case 'q':gameManager.gameMessage.self.classList.toggle('disappear');break;
-                case 'escape':gameManager.gameBody.menu.classList.toggle('disappear');break;
+                case 'control':gameManager.gameBody.menu.classList.toggle('disappear');break;
                 case ' ':if((temp = gameManager.gameMessage.content.video).src){temp.controls = !temp.controls;}break;
             }
         },true);
@@ -656,5 +660,6 @@ window.onload = function(){
         })
     }
     console.clear();console.log('请无视图片请求报错，此为fn.js: getImage()函数的容错。');
-    setTimeout(()=>{gameManager.gameBody.self.animate([{marginLeft:'0',marginTop:'0'}],gameManager.constTemp.moveConfig);});
+    gameManager.makePromise(()=>{gameManager.gameBody.self.animate([{marginLeft:'0',marginTop:'0'}],gameManager.constTemp.moveConfig);});
+    return Promise.all(gameManager.promiseArray);
 }
