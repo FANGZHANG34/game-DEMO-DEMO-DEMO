@@ -1,18 +1,18 @@
 # Goal
 
-- Keyboard
+- ## Keyboard
   
   move: A-S-D-W
   
   toggle: MENU, PHOTO, MESSAGE
   
-- EXjs
+- ## EXjs
 
   undertale-like=system.js: 60%
 
   \[store\].js: 50%
 
-- Canvas Display
+- ## Canvas Display
 
   playerMove: 1 1
 
