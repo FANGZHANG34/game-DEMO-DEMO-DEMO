@@ -8,9 +8,9 @@
   
 - ## EXjs
 
-  undertale-like=system.js: 60%
+  undertale-like-system.js: 60%
 
-  \[store\].js: 50%
+  \[ store \].js: 50%
 
 - ## Canvas Display
 
