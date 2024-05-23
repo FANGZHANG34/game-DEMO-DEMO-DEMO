@@ -1,10 +1,10 @@
 {
     const oldWindowOnload = window.onload;
-    window.onload = ()=>{
-        oldWindowOnload();
+    window.onload = ()=>{oldWindowOnload().then(()=>{
+        // undertaleSystem start
+        window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
+        window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
         {
-            window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
-            window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
             const old_gameInfoSL_loader = Symbol('old_gameInfoSL_loader');
             window.gameManager.gameInfoSL[old_gameInfoSL_loader] = window.gameManager.gameInfoSL.loader;
             window.gameManager.gameInfoSL.loader = function(){
@@ -216,5 +216,7 @@
                 }
             },true);
         }
-    }
+        // undertaleSystem end
+        return Promise.all(window.gameManager.promiseArray);
+    });}
 }
