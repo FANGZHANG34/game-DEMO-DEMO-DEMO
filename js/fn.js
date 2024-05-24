@@ -42,8 +42,9 @@ function getImage(imgUrl){
     const tempImageArray = window.gameManager.constTemp.tempImageArray;
     return new Promise(resolve=>{
         var i = tempImageArray.get(imgUrl);
-        !imgUrl ? resolve(false) : i ? resolve(i) :
-        ((i = new Image()).onerror = ()=>resolve(false),i.onload = ()=>(tempImageArray.set(imgUrl,i),resolve(i)),i.src = imgUrl);
+        !imgUrl ? resolve(false) : i ? resolve(i) : ((i = new Image()).onload = ()=>(
+            i.removeAttribute('onload'),i.removeAttribute('onerror'),tempImageArray.set(imgUrl,i),resolve(i)
+        ),i.onerror = ()=>(i = resolve(false)),i.src = imgUrl);
     });
 }
 // getAudio 兑现音频
@@ -51,8 +52,9 @@ function getAudio(audioUrl){
     const tempAudioArray = window.gameManager.constTemp.tempAudioArray;
     return new Promise(resolve=>{
         var i = tempAudioArray.get(audioUrl);
-        !audioUrl ? resolve(false) : i ? resolve(i.cloneNode()) :
-        ((i = new Audio()).onerror = ()=>resolve(false),i.onload = ()=>(tempAudioArray.set(audioUrl,i),resolve(i.cloneNode())),i.src = audioUrl);
+        !audioUrl ? resolve(false) : i ? resolve(i.cloneNode()) : ((i = new Audio()).onload = ()=>(
+            i.removeAttribute('onload'),i.removeAttribute('onerror'),tempAudioArray.set(audioUrl,i),resolve(i.cloneNode())
+        ),i.onerror = ()=>(i = resolve(false)),i.src = audioUrl);
     });
 }
 // searchSelf 寻找含self属性的真实对象

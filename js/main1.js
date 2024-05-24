@@ -16,57 +16,61 @@ window.onload = ()=>{
         gameTip: false,
         promiseArray:[],
         constTemp: {
-            memory: undefined,tempImageArray: new Map(),tempAudioArray: new Map(),
-            moveDiraction: {_: 0,a: [-1,0,0],s: [0,1,0],d: [1,0,0],w: [0,-1,0]},tempCanvas: makeElement('canvas',{width: 1920,height: 1080}),
-            moveKeyframes: [{translate: undefined}],gameBodyKeyframes: [{translate: undefined}],moveConfig: {duration: 66,fill: 'forwards'}
+            memory: null,tempImageArray: new Map(),tempAudioArray: new Map(),
+            moveDiraction: {_: 0,s: [0,1,0],a: [-1,0,0],w: [0,-1,0],d: [1,0,0]},tempCanvas: makeElement('canvas',{width: 1920,height: 1080}),
+            moveKeyframes: [{translate: null}],gameBodyKeyframes: [{translate: null}],moveConfig: {duration: 66,fill: 'forwards'}
         },
         hoverAudio: new Audio('./audio/1.ogg'),clickAudio: new Audio('./audio/Cancel2.ogg'),bgm: new Audio(),
-        globalProcess:{intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,defaultFn: undefined},
-        dialogueProcess:{intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,defaultFn: undefined},
-        tempProcess:{intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,defaultFn: undefined},
+        globalProcess:{intervalID: null,timeSep: null,paused: false,onEvent: null,nowFn: null,defaultFn: null},
+        dialogueProcess:{intervalID: null,timeSep: null,paused: false,onEvent: null,nowFn: null,defaultFn: null},
+        tempProcess:{intervalID: null,timeSep: null,paused: false,onEvent: null,nowFn: null,defaultFn: null},
         playerMove:{
-            intervalID: undefined,timeSep: undefined,paused: false,onEvent: undefined,nowFn: undefined,promise: false,stepIndex: 0,
-            defaultFn: ()=>{
+            intervalID: null,timeSep: null,paused: true,onEvent: null,nowFn: null,
+            promise: false,moveD: 0,step: 0,
+            async stepFn(){return getImage(memoryHandle('characterArray.'+gameManager.gamePlayer.id+'.display')).then(value=>(
+                clearCanvas(gameManager.gamePlayer.display).drawImage(value,-this.step * 120,-this.moveD * 120),this.step && this.step--
+            ))},
+            defaultFn(){
+                var temp,i;
                 const moveD = gameManager.constTemp.moveDiraction;
-                if(gameManager.gamePlayer.id !== undefined && moveD._){
+                if(gameManager.gamePlayer.id !== null && moveD._){
                     const previous = gameManager.gamePlayer.xyz.concat();
-                    var temp;
-                    for(var i of 'asdw'){
+                    for(this.moveD = 0;this.moveD < 4;this.moveD++){
                         if(
                             (
-                                (temp = moveD[i])[2] === moveD._ ? temp[i = 0]
+                                (temp = moveD['sawd'[this.moveD]])[2] === moveD._ ? temp[i = 0]
                                 ? previous[0] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[0] + temp[0]),limitWidth)
                                 : previous[i = 1] = Math.min(Math.max(0,gameManager.gamePlayer.xyz[1] + temp[1]),limitHeight)
-                                : undefined
-                            ) !== undefined
+                                : null
+                            ) !== null
                         ){break;}
                     }
-                    !(previous[i] === gameManager.gamePlayer.xyz[i])
-                    && (!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]])
-                    && !(gameManager.playerMove.stepIndex > 0 && gameManager.playerMove.stepIndex--)
-                    && gameManager.gameMap.onDirectionEvent(previous) && (
-                        gameManager.playerMove.promise = gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,true).
-                        then(()=>gameManager.gameMap.onPointEvent(previous)),gameManager.playerMove.stepIndex = 3
-                    );
+                    previous[i] !== gameManager.gamePlayer.xyz[i] && gameManager.gameMap.onDirectionEvent(previous) &&
+                    (!gameManager.gameMap.board.zone || gameManager.gameMap.board.zone[previous[1]][previous[0]]) ? (
+                        this.promise = gameManager.gamePlayer.loader(gameManager.gamePlayer.id,previous,true).
+                        then(()=>gameManager.gameMap.onPointEvent(previous)),this.step = 3
+                    ) : void this.stepFn();
                 }
             }
         },
         makePromise(fn){this.promiseArray.push(new Promise(resolve=>setTimeout(()=>resolve(fn?.()))));},
-        setGameInterval(type,timeSep){
-            var temp;
-            if(!gameManager[type]){gameManager[type] = {intervalID: undefined,timeSep: undefined,paused: false,onEvent: ()=>{},nowFn: undefined};}
-            temp = gameManager[type];
-            timeSep = +timeSep;
-            if(timeSep !== 0 && isFinite(timeSep) && timeSep !== temp.timeSep){
-                temp.timeSep = timeSep;
-                clearInterval(temp.intervalID);
-                temp.intervalID = setInterval(async()=>void(
-                    temp.stepIndex ? temp.defaultFn?.() : (
-                        temp.promise = await temp.promise,
-                        temp.paused || (temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.()) || temp.defaultFn?.())
-                    )
-                ),timeSep);
-            }
+        setGameInterval(type,timeSep,exMode = 0){
+            const temp = gameManager[type] ??= {intervalID: null,timeSep: null,paused: false,onEvent: ()=>{},nowFn: null};
+            exMode && (temp.promise ??= false),exMode > 1 && (temp.step ??= 0),
+            (timeSep = +timeSep) !== 0 && isFinite(timeSep) && timeSep !== temp.timeSep && (
+                temp.timeSep = timeSep,temp.intervalID?.constructor === Number && clearInterval(temp.intervalID),
+                temp.intervalID = setInterval(
+                    !exMode-- ? async()=>temp.paused || (temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.() ?? null) || temp.defaultFn?.())
+                    : !exMode-- ? async()=>temp.paused || (
+                        temp.promise = await temp.promise ?? false,
+                        temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.() ?? null) || temp.defaultFn?.()
+                    ) : !exMode-- ? async()=>temp.paused || temp.promise && await temp.stepFn?.() || (
+                        temp.promise = await temp.promise ?? false,
+                        temp.onEvent?.(),(temp.nowFn &&= temp.nowFn?.() ?? null) || temp.defaultFn?.()
+                    ) : ()=>(clearInterval(temp.intervalID),console.error('=> Wrong exMode when setGameInterval !')),
+                    timeSep
+                )
+            )
             return temp;
         },
         bgs(audioUrl){getAudio(audioUrl).then(value=>(
@@ -75,6 +79,11 @@ window.onload = ()=>{
         ));}
     };
     gameManager.constTemp.tempImageArray.set('tempCanvas',gameManager.constTemp.tempCanvas);
+    gameManager.makePromise(()=>(
+        // 设置循环计时器
+        gameManager.setGameInterval('globalProcess',100),gameManager.setGameInterval('playerMove',16,2),
+        gameManager.setGameInterval('dialogueProcess',66),gameManager.setGameInterval('tempProcess',100),null
+    ));
 
     // configArray 本地配置
     // hoverAudio 鼠标音效元素
@@ -147,7 +156,7 @@ window.onload = ()=>{
         // .onDirectionEvent() 检测某位置的前进方向是否触发什么事件
         // .onPointEvent() 检测某位置触发什么事件
         const gameMap = gameManager.gameMap = {
-            mapID: undefined,
+            mapID: null,
             mapConcat: Array.from(document.getElementsByClassName('mapImg')),
             loader(mapID){
                 var imgUrl = memoryHandle('mapDataArray.'+(gameManager.gameFileSL.origin[0].mapID = this.mapID = mapID)+'.0');
@@ -183,7 +192,7 @@ window.onload = ()=>{
             // .array 单位区块子元素集合
             // .loader() 加载地图通行区域
             const mapBoard = gameMap.board = {
-                self: document.getElementById('gameMapBoard'),array: [],zone: undefined,
+                self: document.getElementById('gameMapBoard'),array: [],zone: null,
                 loader(boardZoneArray){
                     this.zone = [];
                     for(let i of Object.keys(boardZoneArray)){
@@ -215,7 +224,7 @@ window.onload = ()=>{
                     this.nodeArray = [];
                     for(object of characterInfoArray){
                         this.nodeArray.push(i = Object.assign(
-                            {},gameManager.gamePlayer,{id: undefined,xyz: [],self: this.nodeTemp.cloneNode(true),photo: undefined}
+                            {},gameManager.gamePlayer,{id: null,xyz: [],self: this.nodeTemp.cloneNode(true),photo: null}
                         ));
                         i.loader(object.id,object.xyz);
                         gameManager.gamePlayer.self.insertAdjacentElement('beforebegin',i.self);
@@ -234,7 +243,7 @@ window.onload = ()=>{
         // .loader() 加载主角方位
         // .focus() 聚焦主角方位
         const gamePlayer = gameManager.gamePlayer = {
-            id: undefined,xyz: [],display: undefined,self: document.getElementById('player'),
+            id: null,xyz: [],display: null,self: document.getElementById('player'),
             loader(id,xyz,isFocus = false){
                 const moveKeyframe = gameManager.constTemp.moveKeyframes[0];
                 this.id !== id && (
@@ -252,7 +261,7 @@ window.onload = ()=>{
                 isFocus && this.focus(),
                 this === gamePlayer && (
                     gameManager.gameFileSL.origin[0].id = id,
-                    this.photo.temp.src = memoryHandle('characterArray.'+id+'.photo','r'),
+                    this.photo.loader(memoryHandle('characterArray.'+id+'.photo')),
                     xyz && gameManager.gameMap.board.loader(memoryHandle('mapDataArray.'+gameManager.gameMap.mapID+'.1')[xyz[2]])
                 );
                 return this.self.animate(moveKeyframe,gameManager.constTemp.moveConfig).finished;
@@ -272,29 +281,15 @@ window.onload = ()=>{
         };
         gamePlayer.self.insertAdjacentElement("beforeend",makeElement('canvas',{width: 120,height: 120}));
         {
-            // playerPhoto 立绘
-            const gamePlayerPhoto = gamePlayer.photo = {
+            // photo 立绘
+            const photo = gamePlayer.photo = {
                 self: document.getElementById('playerPhoto'),
-                temp: new Image()
+                loader(imageUrl){getImage(imageUrl).then(value=>clearCanvas(this.self).drawImage(value,0,0));}
             };
-            gamePlayerPhoto.self.height = 2025;
-            gamePlayerPhoto.context = gamePlayerPhoto.self.getContext('2d');
-            // gamePlayerPhoto.temp.src = './img/actor0.jpg';
-            gamePlayerPhoto.temp.onload = ()=>{
-                gamePlayerPhoto.self.width = 720;
-                gamePlayerPhoto.context.drawImage(gamePlayerPhoto.temp,0,0);
-            }
+            [photo.self.width,photo.self.height] = [720,2025];
         }
     }
     console.log(3);
-    {
-        // 设置循环计时器
-        gameManager.setGameInterval('globalProcess',100);
-        gameManager.setGameInterval('playerMove',16);
-        gameManager.setGameInterval('dialogueProcess',66);
-        gameManager.setGameInterval('tempProcess',100);
-    }
-    console.log(4);
     {
         // gameFileSL 游戏存档
         // .origin 存档管理元素
@@ -335,7 +330,7 @@ window.onload = ()=>{
         // .saver() 保存存档
         // .deleter() 删除存档
         const gameInfoSL = gameManager.gameInfoSL = {
-            self: document.getElementById('infoSL'),index: undefined,temp: undefined,
+            self: document.getElementById('infoSL'),index: null,temp: null,
             saveDataTemp: {
                 mapID: '001',id: 0,xyz: [16,9,0],partner: [],switch: [],record: {},
                 memory: {itemList: {onceArray: {},twiceArray: {},onfitArray: {}},characterArray: {1:{selfEvent: '4'}},mapDataArray: {}}
@@ -425,7 +420,7 @@ window.onload = ()=>{
             // .audio 音频
             const content = gameMessage.content = {
                 self: document.getElementById('messageContent'),
-                textId: undefined,text: document.getElementById('messageText'),
+                textId: null,text: document.getElementById('messageText'),
                 image: {self: document.getElementById('messageImage'),autoReset: true},
                 video: document.getElementById('messageVideo'),audio: new Audio(),
                 reset(){
@@ -437,7 +432,7 @@ window.onload = ()=>{
                 loader(text,audioUrl,imageUrl,videoUrl){
                     const autoReset = this.image.autoReset,temp0 = content.image.self,temp1 = temp0.getContext('2d');
                     this.video.volume = this.audio.volume = configArray.globalArray.globalVolume * configArray.globalArray.dialogue,
-                    this.textId && clearInterval(this.textId),this.textId = undefined,
+                    this.textId && clearInterval(this.textId),this.textId = null,
                     text && (text = Array.from(text),this.textId = setInterval(()=>(
                         this.text.textContent += text.shift() || (clearInterval(this.textId),''),
                         this.self.scrollTo({top:this.self.scrollHeight,behavior:'smooth'})
@@ -445,12 +440,12 @@ window.onload = ()=>{
                     imageUrl && (temp0.classList.remove('disappear'),getImage(imageUrl).then(value=>(
                         autoReset && (temp1.clearRect(0,0,temp0.width,temp0.height),temp1.closePath()),value && temp1.drawImage(value,0,0)
                     ))),
-                    videoUrl && (this.video.src = videoUrl,console.time('v'),this.video.classList.remove('disappear')),
+                    videoUrl && (this.video.src = videoUrl,this.video.classList.remove('disappear')),
                     audioUrl && (this.audio.src = audioUrl,this.audio.play());
                 }
             };
             [content.image.self.width,content.image.self.height] = [1920,1080],
-            content.video.oncanplay = function(){console.timeEnd('v'),this.play(),this.classList.remove('disappear');};
+            content.video.oncanplay = function(){this.play(),this.classList.remove('disappear');};
             content.video.onended = function(){gameMessage.option.ended = true,this.classList.add('disappear');};
         }
         {
@@ -461,7 +456,7 @@ window.onload = ()=>{
             // .choiceArray 分支选项子元素集合
             // .setChoiceArray() 设置对话分支选项
             const option = gameMessage.option = {
-                ended: true,finallyFn: undefined,choiceArray: undefined,
+                ended: true,finallyFn: null,choiceArray: null,
                 dialogue: document.getElementById('messageDialogue'),
                 choice: document.getElementById('messageChoice'),
                 reset(){
@@ -558,7 +553,7 @@ window.onload = ()=>{
                         nowTextLength = nowText.textContent.length,
                         !gameManager.gameMessage.self.className && !gameManager.gameMessage.option.dialogue.className
                         ? previousTextLength === nowTextLength ? (gameManager.gameMessage.option.ended = true,previousTextLength = 0)
-                        : (previousTextLength = nowTextLength,autoDialogue) : undefined
+                        : (previousTextLength = nowTextLength,autoDialogue) : null
                     )
                     break;
                 }
@@ -569,13 +564,13 @@ window.onload = ()=>{
                     );
                     break;
                 }
-                case 'messageNormal':gameManager.globalProcess.nowFn = undefined;break;
+                case 'messageNormal':gameManager.globalProcess.nowFn = null;break;
                 case 'loadSL':gameManager.gameInfoSL.loader();break;
                 case 'saveSL':gameManager.gameInfoSL.index !== '0' ? gameManager.gameInfoSL.saver() : alert('！！！自动存档不支持写入！！！');break;
                 case 'deleteSL':gameManager.gameInfoSL.index !== '0' ? gameManager.gameInfoSL.deleter() : alert('！！！自动存档不支持删除！！！');break;
                 case 'config':{
                     for(let i of Object.keys(configArray.globalArray)){
-                        temp = [configArray.globalArray[i],gameManager.gameBody.menuBoard.config[i],undefined];
+                        temp = [configArray.globalArray[i],gameManager.gameBody.menuBoard.config[i],null];
                         temp[2] = temp[1].nextElementSibling;
                         switch(i){
                             case 'textSep':temp[1].textContent = 100 / temp[0];temp[2].scrollTop = (Math.log10(temp[0]) - 1) * 1000;break;
@@ -602,7 +597,7 @@ window.onload = ()=>{
                 case 'resetConfig':{
                     const resetArrray = [0.2,1,1,1,100,0].reverse();
                     for(let i of Object.keys(configArray.globalArray)){
-                        temp = [resetArrray.pop(),gameManager.gameBody.menuBoard.config[i],undefined];
+                        temp = [resetArrray.pop(),gameManager.gameBody.menuBoard.config[i],null];
                         temp[2] = temp[1].nextElementSibling;
                         switch(i){
                             case 'textSep':temp[1].textContent = temp[0];temp[2].scrollTop = (Math.log10(temp[0]) - 1) * 1000;break;
@@ -649,7 +644,7 @@ window.onload = ()=>{
                 case ' ':if((temp = gameManager.gameMessage.content.video).src){temp.controls = !temp.controls;}break;
             }
         },true);
-        Array.prototype.forEach.call(document.querySelectorAll('.scrollDiv'),element=>element.onscroll = function(e){
+        Promise.resolve(function(e){
             // scroll2set
             const configStage = e.target.previousElementSibling;
             switch(e.target.parentElement.id){
@@ -657,7 +652,7 @@ window.onload = ()=>{
                 case 'modeHard':configStage.textContent = 10 - Math.floor(e.target.scrollTop / 100);break;
                 default:configStage.textContent = 100 - Math.floor(e.target.scrollTop / 10);
             }
-        })
+        }).then(fn=>Array.prototype.forEach.call(document.querySelectorAll('.scrollDiv'),element=>element.onscroll = fn));
     }
     console.clear();console.log('请无视图片请求报错，此为fn.js: getImage()函数的容错。');
     gameManager.makePromise(()=>{gameManager.gameBody.self.animate([{marginLeft:'0',marginTop:'0'}],gameManager.constTemp.moveConfig);});

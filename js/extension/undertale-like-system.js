@@ -2,8 +2,6 @@
     const oldWindowOnload = window.onload;
     window.onload = ()=>oldWindowOnload().then(()=>{
         // undertaleSystem start
-        window.gameManager.constTemp.UTmoveConfig = {duration: 33,fill: 'forwards'};
-        window.gameManager.constTemp.UTmoveKeyframes = [{translate: undefined}];
         {
             const old_gameInfoSL_loader = Symbol('old_gameInfoSL_loader');
             window.gameManager.gameInfoSL[old_gameInfoSL_loader] = window.gameManager.gameInfoSL.loader;
@@ -17,34 +15,34 @@
             }
         }
         const undertaleManager = window.gameManager.undertaleManager = {
-            body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: undefined,enemyID: undefined,
+            body: {self: makeElement('div',{id: 'undertaleBody',className: 'disappear'})},tempMemory: null,enemyID: null,
             tempFn: ()=>void undertaleManager.closer(),
             undertaleProcess: window.gameManager.undertaleProcess = {
-                intervalID: undefined,timeSep: undefined,paused: true,
+                intervalID: null,timeSep: null,paused: true,moveD: 0,
                 onEvent: ()=>{
-                    var [x,y] = undertaleManager.fighter.xy;
+                    const [x,y] = undertaleManager.fighter.xy;
                     x % 960 || y % 960 || !undertaleManager.UTtheater.corners[+!x + +(y > 0) * 2] || undertaleManager.closer();
                     undertaleManager.UTtheater.enemyAttack.isHit();
                     undertaleManager.UTtheater.enemyAttack.mover();
                 },
-                nowFn: undefined,
-                defaultFn: ()=>{
+                nowFn: null,
+                defaultFn(){
+                    var temp,i;
                     const moveD = gameManager.constTemp.moveDiraction;
-                    if(undertaleManager.fighter.id !== undefined && moveD._){
+                    if(undertaleManager.fighter.id !== null && moveD._){
                         const previous = undertaleManager.fighter.xy.concat();
-                        var temp;
-                        for(var i of 'asdw'){
+                        for(this.moveD = 0;this.moveD < 4;this.moveD++){
                             if(
                                 (
-                                    (temp = moveD[i])[2] === moveD._ ? temp[i = 0]
-                                    ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.xy[0] + temp[0] * 30),960)
-                                    : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.xy[1] + temp[1] * 30),960)
-                                    : undefined
-                                ) !== undefined
+                                    (temp = moveD['sawd'[this.moveD]])[2] === moveD._ ? temp[i = 0]
+                                    ? previous[0] = Math.min(Math.max(0,undertaleManager.fighter.xy[0] + temp[0] * 15),960)
+                                    : previous[i = 1] = Math.min(Math.max(0,undertaleManager.fighter.xy[1] + temp[1] * 15),960)
+                                    : null
+                                ) !== null
                             ){break;}
                         }
                         previous[i] === undertaleManager.fighter.xy[i]
-                        || undertaleManager.fighter.loader(undertaleManager.fighter.id,...previous);
+                        || undertaleManager.fighter.loader(undertaleManager.fighter.id,...previous,this.moveD);
                     }
                 }
             },
@@ -56,7 +54,7 @@
                 window.gameManager.playerMove.paused = true;
                 (temp = this.body.self.classList).contains('disappear') ? undertaleManager.loadTempMemory() : temp.add('disappear');
                 this.UTtheater.loader();
-                this.fighterCondition.array = undefined,this.fighterCondition.loader(fighterID);
+                this.fighterCondition.array = null,this.fighterCondition.loader(fighterID);
                 this.UTtheater.fighter.loader(fighterID);
                 this.UTtheater.enemyAttack.loader();
                 this.body.self.classList.remove('disappear');
@@ -72,7 +70,7 @@
         {
             let temp;
             const fighterCondition = undertaleManager.fighterCondition = {
-                self: makeElement('div',{id: 'fighterConditionStage'}),array: undefined,nodeArray: undefined,
+                self: makeElement('div',{id: 'fighterConditionStage'}),array: null,nodeArray: null,
                 loader(){
                     if(this.array){return;}else{
                         var temp = [],id;
@@ -130,51 +128,52 @@
                 loader(imageUrl){getImage(imageUrl).then(value=>(value && clearCanvas(this.self).drawImage(value,0,0)));}
             };
             UTtheater.enemyAttack = {
-                array:[],tempImage: undefined,seedNum: 0,
+                array:[],tempImage: null,seedNum: 0,
                 self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),
                 loader(enemyID){
                     this.changer().then(value=>!value ? this.drawer() : console.log(value+' is not found !'));
                 },
                 drawer(num = 16){
                     const temp0 = window.gameManager.constTemp.tempCanvas;
+                    var temp;
                     num ||= (this.array = [],this.array.length),this.array.length > num && (this.array = this.array.slice(0,num));
                     if(this.tempImage){
                         const temp1 = clearCanvas(temp0);
                         for(--num;num > -1;num--){
-                            var temp = this.array[num] ??= [getRandomZoneUT(),getRandomZoneUT()];
-                            temp1.drawImage(this.tempImage,temp[0],temp[1]);
+                            temp1.drawImage(this.tempImage,0,0,120,120,(temp = this.array[num] ??= [getRandomZoneUT(),getRandomZoneUT(),0])[0],temp[1],120,120);
                         }
                         clearCanvas(this.self).drawImage(temp0,0,0);
-                    }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
+                    }else{throw new Error('=> UTtheater.enemyAttack.tempImage is null !');}
                 },
                 mover(){
                     var i,temp;
                     if(this.tempImage){
                         for(i of this.array){
                             this.seedNum = (temp = getRandomDiractionUT(this.seedNum))[0] ** 2;
-                            i[0] = Math.min(Math.max(0,i[0] + temp[0] * 30),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 30),960);
+                            i[0] = Math.min(Math.max(0,i[0] + temp[0] * 15),960),i[1] = Math.min(Math.max(0,i[1] + temp[1] * 15),960);
                         }
                         this.drawer();
-                    }else{throw new Error('=> UTtheater.enemyAttack.tempImage is undefined !');}
+                    }else{throw new Error('=> UTtheater.enemyAttack.tempImage is null !');}
                 },
                 async changer(skill = './img/无名剑客.jpg'){
                     const selfContext = this.self.getContext('2d');
-                    return this.tempImage = await getImage(skill) || undefined,skill ? getImage(skill) ? false : skill :
-                    (selfContext.clearRect(0,0,1080,1080),selfContext.closePath(),this.tempImage = undefined,'None');
+                    return this.tempImage = await getImage(skill) || null,skill ? getImage(skill) ? false : skill :
+                    (selfContext.clearRect(0,0,1080,1080),selfContext.closePath(),this.tempImage = null,'None');
                 },
                 isHit(){
-                    this.array.reduce((s,i)=>(s += Math.hypot((i[0] - UTtheater.fighter.xy[0]),(i[1] - UTtheater.fighter.xy[1])) < 120),0)
-                    && (window.gameManager.hoverAudio.currentTime = 0,window.gameManager.hoverAudio.play());
+                    this.array.reduce((s,i)=>(s += i[2] !== 0 ? (i[2]--,0) : Math.hypot(
+                        i[0] - UTtheater.fighter.xy[0],i[1] - UTtheater.fighter.xy[1]
+                    ) < 120 && (i[2] = 11,1)),0) && (window.gameManager.hoverAudio.currentTime = 0,window.gameManager.hoverAudio.play());
                 }
             };
             undertaleManager.fighter = UTtheater.fighter = {
-                id: undefined,xy: [480,480],display: makeElement('canvas',{width: 1080,height: 1080}),
-                self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),tempImage: undefined,
-                async loader(id,x = 480,y = 480){
+                id: null,xy: [480,480],display: makeElement('canvas',{width: 1080,height: 1080}),
+                self: UTtheater.self.insertAdjacentElement('beforeend',makeElement('canvas',{width: 1080,height: 1080})),tempImage: null,
+                async loader(id,x = 480,y = 480,moveD = 0){
                     Promise.resolve(this.id !== id ? (
-                        this.tempImage = (await getImage(memoryHandle('characterArray.'+id+'.display'))) || undefined
+                        this.tempImage = (await getImage(memoryHandle('characterArray.'+id+'.display'))) || null
                     ) : this.tempImage).then(value=>(value ? (
-                        clearCanvas(this.display).drawImage(value,480,480),this.id = id,
+                        this.id = id,clearCanvas(this.display).drawImage(value,0,moveD * 120,120,120,480,480,120,120),
                         clearCanvas(this.self).drawImage(this.display,(this.xy[0] = x) - 480,(this.xy[1] = y) - 480)
                     ) : console.error(id+' has wrong display !')));
                 }
@@ -194,7 +193,7 @@
         insertAdjacentElement('beforeend',undertaleManager.fighterCondition.self).
         insertAdjacentElement('afterend',undertaleManager.UTtheater.self).
         insertAdjacentElement('afterend',undertaleManager.fighterBoard.self);
-        window.gameManager.setGameInterval('undertaleProcess',33);
+        window.gameManager.setGameInterval('undertaleProcess',16);
 
         {
             document.addEventListener('mousemove',e=>{
@@ -218,5 +217,5 @@
         }
         // undertaleSystem end
         return Promise.all(window.gameManager.promiseArray);
-    },()=>console.error('=> sth. wrong before "undertale-like-system"!'));
+    },err=>console.error('=> Before "undertale-like-system"!\n\n'+err));
 }

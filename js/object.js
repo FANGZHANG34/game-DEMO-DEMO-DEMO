@@ -4,15 +4,15 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
         zone:false,
         selfEvent:undefined,
         name:'无名剑客',
-        display:'./img/无名剑客.jpg',
-        face:'./img/无名剑客.jpg',
+        display:'./img/wmjk.png',
+        face:'./img/actor0.jpg',
         photo:'./img/actor0.jpg'
     }).set(1,{
         zone:false,
         selfEvent:undefined,
         name:'林元',
-        display:'./img/林元.jpg',
-        face:'./img/林元.jpg',
+        display:'./img/actor1.jpg',
+        face:'./img/actor1.jpg',
         photo:'./img/actor1.jpg'
     })
     .forEach(function(value,key){this[key] = value.name;},objectArray.characterArray.list = []);
@@ -68,7 +68,7 @@ const objectArray = {characterArray: new Map(),eventArray: new Map()};
 君既不能解我忧 为何问我夜独行
 穷途哪有星月光 公子为何慕皮囊
 空荡泉台寂无声 执笔采花做凡尘
-等过畅往烟消云散 世上少见有心人`,audioUrl:'./audio/10_画皮.opus',videoUrl:'',imageUrl:'./img/画船记.png'},
+等过畅往烟消云散 世上少见有心人`,audioUrl:'./audio/10_画皮.opus',videoUrl:'',imageUrl:'./img/art_bg.png'},
                 {}
             );
         }
