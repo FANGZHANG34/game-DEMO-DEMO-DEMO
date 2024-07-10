@@ -48,22 +48,22 @@ person.self = elementNode;
 'self' in person; // true
 person.self instanceof HTMLElement; // true
 ```
-这些对象整体并非一成不变，如果想实时了解“有哪些‘人’，其本身都是什么类型的元素节点”，可以使用 `searchSelf()` 函数，其将返回字符串数组，以便了解这些“人”：
+这些对象整体并非一成不变，如果想实时了解“有哪些‘人’，其本身都是什么类型的元素节点”，可以使用 `searchSelf()` 函数，其将返回一个对象，以便了解这些“人”：
 ```
 searchSelf();
 ```
 ```
 // return below: [...]
-// "gameManager[key]... tagName"
-0: "gameManager.gameBody div"
-1: "gameManager.gameBody.gameTip div"
-2: "gameManager.gameBody.menuBoard div"
+// [pathStr]: Element
+_: 28
+gameManager.gameBody: div
+gameManager.gameBody.gameTip: div"
+gameManager.gameBody.menuBoard: div"
 ...
-25: "gameManager.undertaleManager.fighterBoard.fighterSkill div"
-26: "gameManager.undertaleManager.fighterBoard.fighterItem div"
-27: "gameManager.undertaleManager.fighterBoard.fighterPartner div"
-length: 28
-[[Prototype]]: Array(0)
+gameManager.undertaleManager.fighterBoard.fighterSkill: div
+gameManager.undertaleManager.fighterBoard.fighterItem: div
+gameManager.undertaleManager.fighterBoard.fighterPartner: div
+[[Prototype]]: Object
 ```
 因此没有 `self` 属性的对象（包括 `gameManager` 对象）并不会直接出现在 HTML 页面中，而是通过这些“人”体现在 HTML 页面中。
 
@@ -146,7 +146,7 @@ for(let artPerson of Object.keys(window.gameManager)){
 
 全局常量对象会先于网页和 `gameManager` 对象进行初始化，是 `gameManager` 对象工作时需要用到的数据库。它们作为 js 文件通过 HTML 文件的`<script>`标签实现。
 
-默认的全局常量对象有 `mapDataArray`（./js/map.js）, `objectArray.characterArray`（./js/object.js）, `objectArray.eventArray`（./js/object.js）。
+默认的全局常量对象有 `mapDataArray`（./js/map.js）, `objectArray.characterArray`（./js/character.js）, `objectArray.eventArray`（./js/event.js）。
 
 这些全局常量对象不宜在游戏内修改，也不方便存入存档，所以我设计了 `memory` 对象。
 
@@ -196,14 +196,16 @@ for(let artPerson of Object.keys(window.gameManager)){
 ```
 {
     const oldWindowOnload = window.onload;
-    window.onload = ()=>oldWindowOnload().then(()=>{
+    window.onload = ()=>timeRecord(oldWindowOnload).then(({value: oldGameManager,time})=>{
+        console.log('!! OldWindowOnload 用时',time,'ms');
+        const gameManager = oldGameManager;
         // myScript start
 
         ... // Symbol(1)
 
         // myScript end
-        return Promise.all(window.gameManager.promiseArray);
-    },()=>console.error('=> sth. wrong before "myScript"!'));
+        return gameManager.completeSelf('extension/undertale-like-system.js');
+    });
 }
 ```
 这样我们就可以在确保 `gameManager` 对象生成后在 `Symbol(1)` 处对其进行魔改了。下面我们来预设几种想法：
