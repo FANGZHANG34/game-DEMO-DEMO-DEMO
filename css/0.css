@@ -2,9 +2,11 @@
     margin: 0;
     padding: 0;
     border: 0;
-    /* transition-duration: 200ms; */
 }:root{
     --mapWidth: 1920px;
+    --halfBlack: rgba(0, 0, 0, 0.5);
+    --halfWhite: rgba(225, 225, 225, 0.5);
+    --noColor: rgba(0, 0, 0, 0);
 }html{
     cursor: default;
     background-color: black;
@@ -17,30 +19,80 @@
 }hr{
     border: 1px solid white;
 }.disappear{
-    /* display: none !important; */
     visibility: hidden;
 }::-webkit-scrollbar{
     display: none;
-}
-/*开始界面*/
-#startGame{
-    width: 100vw;
-    height:  56.25vw;
-    text-align: center;
-    align-content: center;
-    background-color: #212;
-    font-size: 10vw;
-    line-height: 2.5vw;
-    color: #090;
-    z-index: 10;
 }
 /*游戏提示*/
 #gameTip{
     position: fixed !important;
     width: 20vw;
+    translate: 0px 0px 0px;
     border: .5vw solid #ccc;
     background-color: black;
     z-index: 10;
+}
+/*游戏提醒*/
+#gamePrompt{
+    position: fixed !important;
+    width: 100%;
+    height: 100%;
+    background-color: var(--halfBlack);
+    z-index: 10;
+}#gamePrompt *{
+    color: #faa;
+    position: absolute;
+}#gamePrompt>div{
+    width: 50vw;
+    height: 28vw;
+    translate: 25vw 12.5vw 0px;
+    background-color: #333;
+}#gamePrompt>div>pre{
+    width: 47.5vw;
+    height: 17.5vw;
+    padding: 1.25vw;
+    font-size: 2.5vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    background-color: #242;
+}#gamePrompt>div>textarea{
+    width: 45vw;
+    height: 4vw;
+    font-size: 2vw;
+    padding: 0 2.5vw 0;
+    translate: 0px 20vw 0px;
+    resize: none;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    background-color: var(--noColor);
+}#gamePrompt>div>textarea:focus{
+    background-color: black;
+    outline: solid #4c4;
+}#gamePrompt>div>textarea::placeholder{
+    color: #fff;
+}#gamePrompt>div>textarea:focus::placeholder{
+    color: #aaa;
+}#gamePrompt>div>button:nth-last-of-type(1){
+    width: 10vw;
+    height: 4vw;
+    font-size: 2vw;
+    padding: 0 2vw 0;
+    translate: 40vw 24vw 0px;
+    text-align: center;
+    align-content: center;
+}#gamePrompt>div>button:nth-last-of-type(2){
+    width: 10vw;
+    height: 4vw;
+    font-size: 2vw;
+    padding: 0 2vw 0;
+    translate: 30vw 24vw 0px;
+    text-align: center;
+    align-content: center;
+}#gamePrompt>div>button{
+    font-weight: bolder;
+    background-color: rgba(0,0,0,0);
+}#gamePrompt>div>button:hover{
+    background-color: var(--halfWhite);
 }
 /*挡板*/
 #gameBorder{
@@ -83,10 +135,13 @@ canvas.mapImg{
     z-index: 4;
 }
 /*媒体*/
-#messageVideo,#messageImage,video{
+#messageVideo,#messageImage{
     z-index: 8;
     width: 100vw;
     height: 56.25vw;
+}
+#messageVideo:not(:active){
+    cursor: none;
 }
 /*消息*/
 #gameMessage{
@@ -111,7 +166,7 @@ canvas.mapImg{
     width: calc(50vw / 3);
     height: calc(50vw / 3);
 }#messageContent{
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--halfBlack);
     width: calc(151vw / 3);
     overflow-y: scroll;
 }#messageText{
@@ -128,7 +183,6 @@ canvas.mapImg{
     width: 33vw;
     height: calc(125vw / 6);
 }#messageOption>div>div{
-    width: 33vw;
     height: 4vw;
     font-size: 2.5vw;
     text-align: center;
@@ -161,12 +215,12 @@ canvas.mapImg{
     align-content: center;
     scale: 1;
 }#option>div:hover{
-    scale: 1.5;
-    background-color: rgba(225, 225, 225, 0.5);
+    scale: 1 1.25;
+    background-color: var(--halfWhite);
 }#menuBoard{
     width: 60vw;
     overflow: hidden;
-    border: calc(5vw / 12) solid rgba(225, 225, 225, 0.5);
+    border: calc(5vw / 12) solid var(--halfWhite);
 }#menuBoard>div{
     position: absolute;
     width: 60vw;
@@ -176,7 +230,7 @@ canvas.mapImg{
     font-size: 2vw;
     font-weight: bold;
     color: #faa;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--halfBlack);
     text-align: left;
     line-height: 3vw;
     white-space: pre-wrap;
@@ -188,25 +242,31 @@ canvas.mapImg{
     width: 40vw;
     height: 50vw;
     margin: 0 2vw;
+    font-size: 2.5vw;
 }#characterContent>div{
     overflow: scroll;
 }#characterList{
-    height: 7.5vw;
-    font-size: 5vw;
+    height: 5vw;
+    white-space: nowrap;
+}#characterList>div{
+    display: inline-block;
+    height: 5vw;
+    width: 15vw;
+    text-align: center;
+    align-content: center;
+    background: linear-gradient( 135deg, #622, #226);
 }#characterInfo{
-    height: 22.5vw;
-    font-size: 2.5vw;
+    height: 25vw;
 }#itemBoard{
     height: 20vw;
-    font-size: 2.5vw;
-}#characterDisplay{
+}#characterPhoto{
     width: 16vw;
     height: 45vw;
 }.galleryNode{
     width: 16vw;
     height: 9vw;
     margin: 2vw;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--halfBlack);
     display: inline-block;
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -219,7 +279,7 @@ canvas.mapImg{
     height: 50vw;
     font-size: 2.5vw;
     margin-left: 2.5vw;
-    background-color: rgba(225, 225, 225, 0.5);
+    background-color: var(--halfWhite);
     vertical-align: top;
 }#myConfig>div>div{
     vertical-align: top;
@@ -257,7 +317,7 @@ canvas.mapImg{
 }
 #SL{
     font-size: 2.5vw;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--halfBlack);
     width: 30vw !important;
     text-align: center;
     overflow: scroll;
@@ -266,10 +326,10 @@ canvas.mapImg{
     align-content: center;
     scale: 1;
 }#SL>div:hover{
-    scale: 1.5;
+    scale: 1 1.25;
     background-color: rgba(225, 225, 225, 0.2);
 }#SL>div.focus{
-    scale: 1.5;
+    scale: 1 1.25;
     background-color: rgba(150, 225, 150, 0.6);
 }#infoSL{
     margin-left: 30vw;
@@ -284,7 +344,7 @@ canvas.mapImg{
     vertical-align: top;
     align-content: center;
 }#infoSL>div:hover{
-    opacity: 0.5;
+    background: linear-gradient( #ccc, #333 25%, #333 75%, #ccc);
 }#loadSL{
     background-color: #0c0;
 }#saveSL{

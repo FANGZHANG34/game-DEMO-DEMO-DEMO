@@ -13,17 +13,13 @@
     height: 56.25vw;
 }#fighterConditionStage,#fighterBoard{
     width: 21.875vw;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-/* 状态栏 */
-#thisFighter{
+    background-color: var(--halfBlack);
+}.nowThisDiv{
     background-color: #c6c;
 }
+/* 状态栏 */
 #fighterConditionStage div{
     height: 2.5vw;
-}#fighterHP,#fighterMP,#fighterCharge{
-    margin-left: 10vw;
-    width: 10vw;
 }#fighterThis{
     width: 20vw;
     overflow: scroll;
@@ -32,19 +28,18 @@
     text-align: center;
     align-content: center;
     scroll-snap-align: start;
-}#fighterHP{
+}#fighterHP>.fighterInfoText{
     background-color: #0c0;
-}#fighterMP{
+}#fighterMP>.fighterInfoText{
     background-color: #00c;
-}#fighterCharge{
+}#fighterCharge>.fighterInfoText{
     background-color: #ccc;
 }.fighterInfoName,.fighterInfoText{
     text-align: center;
     vertical-align: top;
     width: 10vw;
-}.fighterInfoName{
-    position: absolute;
-    margin-left: -10vw;
+    display: inline-block;
+    scale: 1;
 }#fighterBuff,#fighterDebuff{
     white-space: nowrap;
     overflow: scroll hidden;
@@ -61,7 +56,6 @@
 }#fighterPhoto{
     width: 20vw;
     height: 41.25vw;
-    background-color: aquamarine;
 }
 /* 战场 */
 #UTtheater{
@@ -72,6 +66,43 @@
     height: 56.25vw;
 }
 /* 操控面板 */
-#fighterBoard{
+#fighterBoard>div{
+    overflow: scroll;
+}#fighterPartner{
+    height: 3.75vw;
+}#fighterPartner>div{
+    align-content: center;
+    text-align: center;
+    height: 3.75vw;
+}#fighterSkill{
+    width: 61.875vw;
+    height: 27.5vw;
+    border-left: 1.875vw solid #c00;
     writing-mode: vertical-lr;
+    translate: 0 0 0;
+}#fighterSkill.wider{
+    translate: -40vw 0 0;
+}#fighterSkill>div{
+    display: inline-block;
+    width: 15vw;
+    height: 5.5vw;
+    writing-mode: horizontal-tb;
+}#fighterItem{
+    height: 25vw;
+}#fighterItem>:nth-child(1){
+    height: 4vw;
+}#fighterItem>:nth-child(1)>div{
+    display: inline-block;
+    width: 7vw;
+    height: 4vw;
+    font-size: 2vw;
+    font-weight: bolder;
+    align-content: center;
+    text-align: center;
+    color: #cc0;
+}#fighterItem>:nth-child(2){
+    height: 21vw;
+}#fighterItem>:nth-child(2)>div{
+    height: 3vw;
+    align-content: center;
 }
